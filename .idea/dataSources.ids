@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="PostgreSQL - postgres@localhost" uuid="3dd26c22-faa5-4b56-9d6b-8af209068eeb">
+    <database-info product="PostgreSQL" version="9.4.5" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.4 JDBC4 (build 1201)">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/>
+    <database-model serializer="dbm" rdbms="POSTGRES" format-version="2.4">
+      <database id="1" name="postgres"/>
+      <schema id="2" parent="1" name="public">
+        <object-id>2200</object-id>
+        <comment>standard public schema</comment>
+        <introspection-timestamp>2016-08-11.22:56:29.402</introspection-timestamp>
+      </schema>
+    </database-model>
+  </data-source>
+</component>
