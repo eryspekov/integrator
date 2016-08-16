@@ -8,4 +8,6 @@ package kg.infocom;
 public class InformationSystem {
 
 
+
+
 }
