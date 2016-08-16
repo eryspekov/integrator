@@ -6,4 +6,5 @@ package kg.infocom;
 public class Organization {
 
 
+
 }
