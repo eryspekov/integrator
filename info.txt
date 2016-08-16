@@ -1,17 +1,13 @@
-spring integration
-
-
-SSO cas
-
-
-
+egrn-spring integration
+SSO-cas
+LDAP-Apache DS
 
 1-Overview
 2-Git
-3-Git, maven
+3-Git, Maven
 4-JUnit, slf4j
-5-Spring
-6-Spring_JUnit
+5-Spring(IoC), Spring_JDBC
+6-Spring(IoC), Spring_JUnit
 7-Hibernate
 8-Spring_Hibernate, Spring_Integration
 9-EJB
