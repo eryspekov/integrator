@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+
+    <bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/integrator"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="postgres"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <bean id="txManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="kg.infocom.model"/>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=org.hibernate.dialect.PostgreSQL9Dialect
+                hibernate.show_sql=true
+            </value>
+        </property>
+    </bean>
+
+    <bean name="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+
+</beans>

@@ -1,16 +1,17 @@
-egrn-spring integration
-SSO-cas
+egrn-spring integration, servicemix.apache.org
+SSO-cas, Gost, RSA
 LDAP-Apache DS
+logging
 
 1-Overview
 2-Git
 3-Git, Maven
 4-JUnit, slf4j
 5-Spring(IoC), Spring_JDBC
-6-Spring(IoC), Spring_JUnit
-7-Hibernate
-8-Spring_Hibernate, Spring_Integration
-9-EJB
+6-Spring(IoC), Spring_JUnit, Hibernate
+7-Hibernate, Cache
+8-Spring_Hibernate_Transactional, Spring_Integration, EJB
+9-EJB, transactions,
 10-Jax-ws
 11-JMS
 12-Servlet, jsp
@@ -18,6 +19,7 @@ LDAP-Apache DS
 14-Servlet
 15-Struts
 16-Jsf
-17-Spring
-18-Jax-rs
-19-Security
+17-Spring Web-MVC
+18-Jax-rs_EJB, Spring_Rests
+19-Spring_Security
+20-Ajax, JavaScript
