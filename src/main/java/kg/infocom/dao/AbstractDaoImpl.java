@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by eryspekov on 16.08.16.
  */
@@ -18,6 +20,10 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
     public AbstractDaoImpl(Class<T> type) { this.type = type; }
 
     public T getById(Integer id) { return ht.get(type, id); }
+
+    public List<T> findAll() {
+        return null;
+    }
 
     public T create(T entity) {
         return null;

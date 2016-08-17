@@ -6,27 +6,27 @@
 
 
     <context:annotation-config/>
-    <!--Scan package for controllers
+    <!--Scan package for controllers-->
 
 
-    <bean id="projectDao" class="ru.expomap.test.dao.AbstractDaoImpl">
+    <bean id="organizationDao" class="kg.infocom.dao.AbstractDaoImpl">
         <constructor-arg>
-            <value>ru.expomap.test.model.Project</value>
+            <value>kg.infocom.model.Organization</value>
         </constructor-arg>
     </bean>
+    <!--
+        <bean id="userDao" class="ru.expomap.test.dao.AbstractDaoImpl">
+            <constructor-arg>
+                 <value>ru.expomap.test.model.User</value>
+            </constructor-arg>
+        </bean>
 
-    <bean id="userDao" class="ru.expomap.test.dao.AbstractDaoImpl">
-        <constructor-arg>
-             <value>ru.expomap.test.model.User</value>
-        </constructor-arg>
-    </bean>
 
-
-    <bean id="taskDao" class="ru.expomap.test.dao.AbstractDaoImpl">
-        <constructor-arg>
-             <value>ru.expomap.test.model.Task</value>
-        </constructor-arg>
-    </bean>
--->
+        <bean id="taskDao" class="ru.expomap.test.dao.AbstractDaoImpl">
+            <constructor-arg>
+                 <value>ru.expomap.test.model.Task</value>
+            </constructor-arg>
+        </bean>
+    -->
 
 </beans>
