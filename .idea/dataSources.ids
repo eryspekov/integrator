@@ -1,17 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="dataSourceStorage">
-  <data-source name="PostgreSQL - postgres@localhost" uuid="3dd26c22-faa5-4b56-9d6b-8af209068eeb">
+  <data-source name="PostgreSQL - integrator@localhost" uuid="bc45ba6f-f1af-4908-ad39-207560856a22">
     <database-info product="PostgreSQL" version="9.3.13" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.4 JDBC4 (build 1201)">
       <identifier-quote-string>&quot;</identifier-quote-string>
     </database-info>
     <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/>
     <database-model serializer="dbm" rdbms="POSTGRES" format-version="2.4">
-      <database id="1" name="postgres"/>
+      <database id="1" name="integrator"/>
       <schema id="2" parent="1" name="public">
         <object-id>2200</object-id>
         <comment>standard public schema</comment>
-        <introspection-timestamp>2016-08-11.22:56:29.402</introspection-timestamp>
+        <introspection-state-number>864</introspection-state-number>
+        <introspection-timestamp>2016-08-17.18:27:49.380</introspection-timestamp>
       </schema>
+      <sequence id="3" parent="2" name="organization_id_seq">
+        <object-id>16631</object-id>
+        <state-number>839</state-number>
+      </sequence>
+      <sequence id="4" parent="2" name="software_id_seq">
+        <object-id>16639</object-id>
+        <state-number>858</state-number>
+      </sequence>
+      <table id="5" parent="2" name="organization">
+        <object-id>16597</object-id>
+        <state-number>842</state-number>
+      </table>
+      <table id="6" parent="2" name="software">
+        <object-id>16641</object-id>
+        <state-number>864</state-number>
+      </table>
+      <column id="7" parent="5" name="id">
+        <state-number>841</state-number>
+        <mandatory>1</mandatory>
+        <data-type>bigint</data-type>
+        <default-expression>nextval(&apos;organization_id_seq&apos;::regclass)</default-expression>
+      </column>
+      <column id="8" parent="5" name="name">
+        <state-number>842</state-number>
+        <mandatory>1</mandatory>
+        <data-type>char(50)</data-type>
+      </column>
+      <index id="9" parent="5" name="organization_id_uindex">
+        <object-id>16658</object-id>
+        <columns>#6</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+      </index>
+      <index id="10" parent="5" name="organization_pkey">
+        <object-id>16637</object-id>
+        <columns>#6</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+      </index>
+      <key id="11" parent="5" name="organization_pkey">
+        <columns>#6</columns>
+        <underlying-index>organization_pkey</underlying-index>
+        <primary>1</primary>
+      </key>
+      <column id="12" parent="6" name="id">
+        <state-number>861</state-number>
+        <mandatory>1</mandatory>
+        <data-type>bigint</data-type>
+        <default-expression>nextval(&apos;software_id_seq&apos;::regclass)</default-expression>
+      </column>
+      <column id="13" parent="6" name="name">
+        <state-number>864</state-number>
+        <mandatory>1</mandatory>
+        <data-type>char(50)</data-type>
+      </column>
+      <index id="14" parent="6" name="software_id_uindex">
+        <object-id>16652</object-id>
+        <columns>id</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+      </index>
+      <index id="15" parent="6" name="software_pkey">
+        <object-id>16650</object-id>
+        <columns>id</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+      </index>
+      <key id="16" parent="6" name="software_pkey">
+        <columns>id</columns>
+        <underlying-index>software_pkey</underlying-index>
+        <primary>1</primary>
+      </key>
     </database-model>
   </data-source>
 </component>
