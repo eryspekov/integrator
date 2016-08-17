@@ -1,16 +1,39 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: eryspekov
-  Date: 17.08.16
-  Time: 10:32
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ include file="header.jsp" %>
+<table border="1">
+    <tr>
+        <td>Name</td>
+        <td>Actions</td>
+    </tr>
+    <c:forEach items="${organizations}" var="i">
+        <tr>
+            <td><c:out value="${i.name}"/></td>
+            <td><a href="organizations/edit/${i.id}">Edit</a>&nbsp;<a href="organizations/delete/${i.id}">Delete</a>
+            </td>
 
-</body>
-</html>
+        </tr>
+    </c:forEach>
+</table>
+<br>
+
+<form:form commandName="organization" method="POST">
+    <form:hidden path="id"/>
+
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td><form:input path="name"/></td>
+            <td><form:errors path="name"/></td>
+
+        </tr>
+
+        <tr>
+            <td></td>
+            <td align="right"><input type="submit" value="submit"></td>
+            <td></td>
+        </tr>
+
+    </table>
+
+
+</form:form>

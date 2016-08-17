@@ -22,18 +22,21 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
     public T getById(Integer id) { return ht.get(type, id); }
 
     public List<T> findAll() {
-        return null;
+        return ht.loadAll(type);
     }
 
     public T create(T entity) {
-        return null;
+        ht.save(entity);
+        return entity;
     }
 
     public T update(T entity) {
-        return null;
+        ht.getSessionFactory().getCurrentSession().clear();
+        ht.saveOrUpdate(entity);
+        return entity;
     }
 
     public void delete(T entity) {
-
+        ht.delete(entity);
     }
 }
