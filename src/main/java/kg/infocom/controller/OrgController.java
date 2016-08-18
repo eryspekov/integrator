@@ -30,7 +30,7 @@ public class OrgController {
     }
 
     @ModelAttribute("organizations")
-    public List<Organization> getAllProjects() {
+    public List<Organization> getAllOrganizations() {
         return organizationDao.findAll();
     }
 
@@ -53,7 +53,7 @@ public class OrgController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String add(@ModelAttribute("project") Organization organization, BindingResult result) {
+    public String add(@ModelAttribute("organization") Organization organization, BindingResult result) {
         //projectValidator.validate(organization, result);
         //if (result.hasErrors())
         //    return "/projects";

@@ -16,7 +16,7 @@
 
     <!--
 
-            <bean id="userValidator" name="userValidator" class="ru.expomap.test.validation.UserValidator"/>
+            <bean id="userValidator" class="ru.expomap.test.validation.UserValidator"/>
             <bean id="projectValidator" name="projectValidator" class="ru.expomap.test.validation.ProjectValidator"/>
             <bean id="taskValidator" name="taskValidator" class="ru.expomap.test.validation.TaskValidator"/>
         -->

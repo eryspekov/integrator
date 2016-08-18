@@ -6,7 +6,6 @@
 
 
     <context:annotation-config/>
-    <!--Scan package for controllers-->
 
 
     <bean id="organizationDao" class="kg.infocom.dao.AbstractDaoImpl">

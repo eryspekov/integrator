@@ -17,6 +17,18 @@ public class Software {
     @Column(name = "name")
     private String name;
 
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinColumn(name = "org_id", nullable = false)
+    private Organization organization;
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
     public Integer getId() {
         return id;
     }
