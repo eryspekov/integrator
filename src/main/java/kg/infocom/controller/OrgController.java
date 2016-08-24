@@ -4,6 +4,8 @@ import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +25,10 @@ public class OrgController {
     @Autowired
     @Qualifier(value = "organizationDao")
     private AbstractDao organizationDao;
+
+    @Autowired
+    @Qualifier(value = "transformationChannel")
+    private MessageChannel transformationChannel;
 
     @RequestMapping("/")
     public String foo() {
@@ -61,6 +67,13 @@ public class OrgController {
         organizationDao.update(organization);
         return "redirect:/organizations";
 
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/logger")
+    public void loggerController() {
+        transformationChannel.send(new GenericMessage<String>("hello"));
+        transformationChannel.send(new GenericMessage<String>("world"));
+       // return "organizations";
     }
 
 }
