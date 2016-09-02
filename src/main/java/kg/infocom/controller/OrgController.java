@@ -26,10 +26,6 @@ public class OrgController {
     @Qualifier(value = "organizationDao")
     private AbstractDao organizationDao;
 
-    @Autowired
-    @Qualifier(value = "transformationChannel")
-    private MessageChannel transformationChannel;
-
     @RequestMapping("/")
     public String foo() {
         return "redirect:/organizations";
@@ -69,11 +65,5 @@ public class OrgController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/logger")
-    public void loggerController() {
-        transformationChannel.send(new GenericMessage<String>("hello"));
-        transformationChannel.send(new GenericMessage<String>("world"));
-       // return "organizations";
-    }
 
 }

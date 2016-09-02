@@ -2,13 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:integration="http://www.springframework.org/schema/integration"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/integration
-       http://www.springframework.org/schema/integration/spring-integration.xsd">
+       http://www.springframework.org/schema/context/spring-context.xsd">
 
 
     <context:annotation-config/>
@@ -26,22 +23,5 @@
         </constructor-arg>
     </bean>
 
-    <!--
-
-            <bean id="taskDao" class="ru.expomap.test.dao.AbstractDaoImpl">
-                <constructor-arg>
-                     <value>ru.expomap.test.model.Task</value>
-                </constructor-arg>
-            </bean>
-        -->
-
-    <bean id="logger" class="kg.infocom.service.Logger"/>
-
-    <integration:channel id="transformationChannel"/>
-    <integration:channel id="outputChannel"/>
-
-    <integration:transformer input-channel="transformationChannel" output-channel="outputChannel" expression="payload.toUpperCase()"/>
-
-    <integration:service-activator input-channel="outputChannel" ref="logger" method="log"/>
 
 </beans>

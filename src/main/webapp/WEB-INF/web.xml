@@ -45,6 +45,7 @@
             /WEB-INF/applicationContext.xml
             /WEB-INF/db-config.xml
             /WEB-INF/dispatcher-servlet.xml
+            /WEB-INF/integrationContext.xml
         </param-value>
     </context-param>
     <listener>

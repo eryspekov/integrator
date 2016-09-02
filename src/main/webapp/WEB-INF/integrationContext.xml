@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bean:beans xmlns:bean="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration
+       http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+
+    <bean:bean id="channelHandler" class="kg.infocom.util.ChannelHandler"/>
+
+    <channel id="getPersonDataByPin"/>
+
+
+
+    <!-- <int:inbound-channel-adapter ref="" method="" channel="">
+        <int:poller fixed-rate="2000"
+    </int:inbound-channel-adapter> -->
+
+    <!-- <integration:publish-subscribe-channel id="publishChannel"/>
+    <integration:channel id="channel"/> -->
+
+    <!-- <integration:aggregator input-channel="" output-channel=""/> -->
+
+    <!-- <integration:filter input-channel="" output-channel="" expression="payload.Length() > 5"/> -->
+
+    <!-- <integration:splitter input-channel="" output-channel="" expression="payload"/> -->
+
+    <service-activator input-channel="getPersonDataByPin" ref="channelHandler" method="getPersonDataByPin"/>
+
+</bean:beans>

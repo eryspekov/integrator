@@ -1,7 +1,8 @@
-egrn-spring integration, servicemix.apache.org
+spring integration, servicemix.apache.org
 SSO-cas, Gost, RSA
 LDAP-Apache DS
 logging
+validator
 
 1-Overview
 2-Git
