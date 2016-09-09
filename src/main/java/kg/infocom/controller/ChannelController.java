@@ -16,16 +16,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class ChannelController {
 
     @Autowired
-    @Qualifier(value = "getPersonDataByPin")
-    private MessageChannel getPersonDataByPin;
+    @Qualifier(value = "requestChannel")
+    private MessageChannel requestChannel;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{method}/{value}")
-    public void getPersonDataByPin(@PathVariable String method, @PathVariable String value) {
-
-        if (method.equals("getPersonDataByPin")) {
-            getPersonDataByPin.send(new GenericMessage<String>(value));
-            //getPersonDataByPin.
+    @RequestMapping(method = RequestMethod.GET, value = "/{value}")
+    public void getPersonDataByPin(@PathVariable String value) {
+        requestChannel.send(new GenericMessage<String>(value));
         }
-    }
+
 
 }
