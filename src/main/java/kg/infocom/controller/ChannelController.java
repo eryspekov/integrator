@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * Created by eryspekov on 25.08.16.
  */
-@Controller
+//@Controller
 public class ChannelController {
 
     @Autowired

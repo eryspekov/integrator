@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by eryspekov on 17.08.16.
  */
-@Controller
+//@Controller
 public class SoftwareController {
 
     @Autowired

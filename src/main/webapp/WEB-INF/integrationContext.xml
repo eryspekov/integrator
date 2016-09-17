@@ -20,8 +20,8 @@
             reply-channel="replyChannel"
             path="/services/{pin}"
             payload-expression="#pathVariables.pin">
-        <int-htpp:request-mapping produces="application/json" consumes="application/json"/>
         <!--<int-htpp:request-mapping produces="application/json" consumes="application/json"/>
+        <int-htpp:request-mapping produces="application/json" consumes="application/json"/>
             auto-startup="false"
             view-name="person"
             mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
@@ -53,8 +53,9 @@
     <service-activator input-channel="requestChannel"
                        output-channel="replyChannel"
                        ref="channelHandler"
-                       method="getPersonDataByPin"/>
+                       method="getPersonDataByPin"
+    requires-reply="true"/>
 
-    <!--<service-activator input-channel="replyChannel" ref="channelHandler" method="printText"/>-->
+   <!-- <service-activator input-channel="replyChannel" ref="channelHandler" method="printText"/>-->
 
 </beans:beans>

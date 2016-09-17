@@ -16,52 +16,31 @@ import java.util.Map;
 /**
  * Created by eryspekov on 25.08.16.
  */
-@Component
+//@Component
 public class ChannelHandler {
-
-    private static final String SERVICE_URL = "http://10.51.1.29:9091/ws/passport_pin";
-    private static final String TOKEN = "fc31242d9c4d4a12fc516d1e806b7abb";
 
     public Message<String> getPersonDataByPin(Message<?> inMessage) {
 
-        MessageHeaders headers = inMessage.getHeaders();
         Object payload = inMessage.getPayload();
         Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
-        String id = "test";//(String)headers.get("id");
 
-        //boolean isFound;
-/*        if (id.equals("1")) {
-            employeeList.getEmployee().add(new Employee(1, "John", "Doe"));
-            isFound = true;
-        }
-        else {
-            isFound = false;
-        }
-        if (isFound) {*/
-            setReturnStatusAndMessage("0", "Success", responseHeaderMap);
-        /*}
-        else {
-            setReturnStatusAndMessage("2", "Employee Not Found", employeeList, responseHeaderMap);
-        }*/
+        setReturnStatusAndMessage("0", "Success", responseHeaderMap);
 
-        String text = id == null ? "id is null" : id;
+        String text = "id is null";
         Message<String> message = new GenericMessage<String>(text, responseHeaderMap);
 
-        return MessageBuilder.withPayload(text).copyHeadersIfAbsent(inMessage.getHeaders())
-                .setHeader("http_statusCode", HttpStatus.OK).build();
 
-        //return message;
-/*
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(SERVICE_URL).queryParam("verbose", true);
-        String response = target.queryParam("token", TOKEN)
-                .queryParam("pin", message)
+        WebTarget target = client.target("http://10.51.1.29:9091/ws/passport_pin").queryParam("verbose", true);
+        String response = target.queryParam("token", "fc31242d9c4d4a12fc516d1e806b7abb")
+                .queryParam("pin", payload)
                 .request().accept("application/json").get(String.class);
 
         client.close();
 
-        System.out.println(response);
-*/
+        return MessageBuilder.withPayload(response).copyHeadersIfAbsent(inMessage.getHeaders())
+                .setHeader("http_statusCode", HttpStatus.OK).build();
+
     }
 
     private void setReturnStatusAndMessage(String status,
@@ -73,11 +52,6 @@ public class ChannelHandler {
         //employeeList.setReturnStatusMsg(message);
         responseHeaderMap.put("Return-Status", status);
         responseHeaderMap.put("Return-Status-Msg", message);
-    }
-
-    public void printText(Message<String> text) {
-        System.out.println(text);
-
     }
 
 }
