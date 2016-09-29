@@ -44,6 +44,7 @@
           <element id="library" level="project" name="Maven: org.postgresql:postgresql:9.4-1201-jdbc4" />
           <element id="library" level="project" name="Maven: jstl:jstl:1.2" />
           <element id="library" level="project" name="Maven: javax:javaee-web-api:7.0" />
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.7" />
         </element>
       </element>
       <element id="directory" name="META-INF">
