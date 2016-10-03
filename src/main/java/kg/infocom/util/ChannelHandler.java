@@ -1,6 +1,7 @@
 package kg.infocom.util;
 
 import com.google.gson.*;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -12,6 +13,7 @@ import javax.ws.rs.client.WebTarget;
 /**
  * Created by eryspekov on 25.08.16.
  */
+@PropertySource(value = "classpath:wsPath.properties")
 public class ChannelHandler {
 
     public Message<String> getPersonDataByPin(Message<?> inMessage) {
