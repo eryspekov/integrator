@@ -1,7 +1,13 @@
 package kg.infocom.util;
 
 import com.google.gson.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -13,8 +19,12 @@ import javax.ws.rs.client.WebTarget;
 /**
  * Created by eryspekov on 25.08.16.
  */
-@PropertySource(value = "classpath:wsPath.properties")
+@Configuration
+@PropertySource("classpath:wsPath.properties")
 public class ChannelHandler {
+
+    @Autowired
+    private Environment env;
 
     public Message<String> getPersonDataByPin(Message<?> inMessage) {
 
@@ -41,9 +51,11 @@ public class ChannelHandler {
     public String getPersonDataFromZags(String pin) {
 
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://zagstest.infocom.kg/ws/passport_pin").queryParam("verbose", true);
+        String url = env.getProperty("zags.url");
+        WebTarget target = client.target(url).queryParam("verbose", true);
 
-        String response = target.queryParam("token", "fb8ae3567cb8351e82f96615df005b9a")
+        String token = env.getProperty("zags.token");
+        String response = target.queryParam("token", token)
                 .queryParam("pin", pin)
                 .request().get(String.class);
 
@@ -53,16 +65,14 @@ public class ChannelHandler {
 
     }
 
-    public void getAddress() {
-        String token = "0834ffc7d3d4883934708b1b270747df";
-    }
-
     public String getPersonDataFromPassport(String pin) {
 
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://10.51.1.29:9091/ws/passport_pin").queryParam("verbose", true);
+        String url = env.getProperty("passport.url");
+        WebTarget target = client.target(url).queryParam("verbose", true);
 
-        String response = target.queryParam("token", "fc31242d9c4d4a12fc516d1e806b7abb")
+        String token = env.getProperty("passport.token");
+        String response = target.queryParam("token", token)
                 .queryParam("pin", pin)
                 .request().get(String.class);
 

@@ -9,19 +9,21 @@
 
 
     <context:annotation-config/>
+    <!--
+
+        <bean id="organizationDao" class="kg.infocom.dao.AbstractDaoImpl">
+            <constructor-arg>
+                <value>kg.infocom.model.Organization</value>
+            </constructor-arg>
+        </bean>
+
+        <bean id="softwareDao" class="kg.infocom.dao.AbstractDaoImpl">
+            <constructor-arg>
+                 <value>kg.infocom.model.Software</value>
+            </constructor-arg>
+        </bean>
 
 
-    <bean id="organizationDao" class="kg.infocom.dao.AbstractDaoImpl">
-        <constructor-arg>
-            <value>kg.infocom.model.Organization</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="softwareDao" class="kg.infocom.dao.AbstractDaoImpl">
-        <constructor-arg>
-             <value>kg.infocom.model.Software</value>
-        </constructor-arg>
-    </bean>
-
+-->
 
 </beans>
