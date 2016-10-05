@@ -22,10 +22,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="integrator" />
         <module name="integrator1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="integrator" target="1.5" />
       <module name="integrator1" target="1.5" />
     </bytecodeTargetLevel>
   </component>

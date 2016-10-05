@@ -4,7 +4,7 @@
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
-          <element id="module-output" name="integrator1" />
+          <element id="module-output" name="integrator" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="Maven: org.hibernate:hibernate-core:5.2.1.Final" />
@@ -52,7 +52,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/target/integration/META-INF/MANIFEST.MF" />
       </element>
-      <element id="javaee-facet-resources" facet="integrator1/web/Web" />
+      <element id="javaee-facet-resources" facet="integrator/web/Web" />
     </root>
   </artifact>
 </component>
