@@ -4,8 +4,6 @@ import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,12 +17,13 @@ import java.util.List;
 /**
  * Created by eryspekov on 17.08.16.
  */
-//@Controller
+@Controller
 public class OrgController {
 
     @Autowired
     @Qualifier(value = "organizationDao")
     private AbstractDao organizationDao;
+
 
     @RequestMapping("/")
     public String foo() {
@@ -35,6 +34,7 @@ public class OrgController {
     public List<Organization> getAllOrganizations() {
         return organizationDao.findAll();
     }
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/organizations")
     public String get(Model model) {
@@ -54,7 +54,7 @@ public class OrgController {
         return "redirect:/organizations";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/addorganization")
     public String add(@ModelAttribute("organization") Organization organization, BindingResult result) {
         //projectValidator.validate(organization, result);
         //if (result.hasErrors())
@@ -64,6 +64,5 @@ public class OrgController {
         return "redirect:/organizations";
 
     }
-
 
 }
