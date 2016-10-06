@@ -45,6 +45,18 @@ public class ChannelHandler {
 
     }
 
+    public Message<String> getCatalogByName(Message<?> inMessage) {
+        String url = "http://zags.infocom.kg/ws/nationality_catalog";
+        String key = "ls8dfh3jd7fhsd89fnosdf8j7s8j";
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(url).queryParam("verbose", true);
+        String response = target.queryParam("key", key)
+                .request().get(String.class);
+        client.close();
+        return MessageBuilder.withPayload(response).copyHeadersIfAbsent(inMessage.getHeaders())
+                .setHeader("http_statusCode", HttpStatus.OK).build();
+    }
+
     public String getDataJson(String payload, String url, String token) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(url).queryParam("verbose", true);
@@ -54,5 +66,7 @@ public class ChannelHandler {
         client.close();
         return response;
     }
+
+
 
 }

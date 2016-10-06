@@ -20,16 +20,33 @@
             reply-channel="replyChannel"
             path="/services/{pin}"
             payload-expression="#pathVariables.pin">
-            <!--<int-htpp:request-mapping produces="application/json"/>-->
+        <!--<int-htpp:request-mapping produces="application/json"/>-->
+    </int-htpp:inbound-gateway>
+
+    <int-htpp:inbound-gateway
+            supported-methods="GET"
+            request-channel="requestChannelCatalog"
+            reply-channel="replyChannelCatalog"
+            path="/services/catalog/{name}"
+            payload-expression="#pathVariables.name">
     </int-htpp:inbound-gateway>
 
     <channel id="requestChannel"/>
     <channel id="replyChannel"/>
 
+    <channel id="requestChannelCatalog"/>
+    <channel id="replyChannelCatalog"/>
+
     <service-activator input-channel="requestChannel"
                        output-channel="replyChannel"
                        ref="channelHandler"
                        method="getPersonDataByPin"
+                       requires-reply="true"/>
+
+    <service-activator input-channel="requestChannelCatalog"
+                       output-channel="replyChannelCatalog"
+                       ref="channelHandler"
+                       method="getCatalogByName"
                        requires-reply="true"/>
 
 </beans:beans>
