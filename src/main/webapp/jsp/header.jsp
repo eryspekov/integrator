@@ -6,7 +6,7 @@
 <table width="100%">
     <tr>
         <td align="center"><h2><a href="organizations">Organization Management</a></h2></td>
-        <td align="center"><h2><a href="softwares">Software Management</a></h2></td>
+        <td align="center"><h2><a href="producer_service">Service Management</a></h2></td>
         <!--<td align="center"><h2><a href="tasks">Task Management</a></h2></td>
         -->
     </tr>

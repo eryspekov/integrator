@@ -6,18 +6,18 @@
         <td>Organization</td>
         <td>Actions</td>
     </tr>
-    <c:forEach items="${softwares}" var="i">
+    <c:forEach items="${producer_services}" var="i">
         <tr>
             <td><c:out value="${i.name}"/></td>
             <td><c:out value="${i.organization.name}"/></td>
-            <td><a href="softwares/edit/${i.id}">Edit</a>&nbsp;<a href="softwares/delete/${i.id}">Delete</a>
+            <td><a href="producer_service/edit/${i.id}">Edit</a>&nbsp;<a href="producer_service/delete/${i.id}">Delete</a>
             </td>
         </tr>
     </c:forEach>
 </table>
 <br>
 
-<form:form commandName="software" method="POST" action="addsoftware">
+<form:form commandName="producer_service" method="POST" action="add_producer_service">
     <form:hidden path="id"/>
 
     <table>

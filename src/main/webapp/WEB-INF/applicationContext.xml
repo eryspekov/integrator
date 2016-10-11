@@ -16,9 +16,15 @@
         </constructor-arg>
     </bean>
 
-    <bean id="softwareDao" class="kg.infocom.dao.AbstractDaoImpl">
+    <bean id="producerServiceDao" class="kg.infocom.dao.AbstractDaoImpl">
         <constructor-arg>
-             <value>kg.infocom.model.Software</value>
+             <value>kg.infocom.model.ProducerService</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="consumerService" class="kg.infocom.dao.AbstractDaoImpl">
+        <constructor-arg>
+            <value>kg.infocom.model.ConsumerService</value>
         </constructor-arg>
     </bean>
 

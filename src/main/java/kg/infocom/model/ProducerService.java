@@ -6,8 +6,8 @@ import javax.persistence.*;
  * Created by eryspekov on 17.08.16.
  */
 @Entity
-@Table(name = "software")
-public class Software {
+@Table(name = "producer_service")
+public class ProducerService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class Software {
     private String name;
 
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinColumn(name = "org_id", nullable = false)
+    @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
     public Organization getOrganization() {

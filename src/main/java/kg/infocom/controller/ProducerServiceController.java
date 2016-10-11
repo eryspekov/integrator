@@ -2,10 +2,9 @@ package kg.infocom.controller;
 
 import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.Organization;
-import kg.infocom.model.Software;
+import kg.infocom.model.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,19 +18,19 @@ import java.util.List;
  * Created by eryspekov on 17.08.16.
  */
 @Controller
-public class SoftwareController {
+public class ProducerServiceController {
 
     @Autowired
-    @Qualifier(value = "softwareDao")
-    private AbstractDao softwareDao;
+    @Qualifier(value = "producerServiceDao")
+    private AbstractDao producerServiceDao;
 
     @Autowired
     @Qualifier(value = "organizationDao")
     private AbstractDao organizationDao;
 
-    @ModelAttribute("softwares")
-    public List<Software> getAllSoftwares() {
-        return softwareDao.findAll();
+    @ModelAttribute("producer_services")
+    public List<ProducerService> getAllServices() {
+        return producerServiceDao.findAll();
     }
 
     @ModelAttribute("organizations")
@@ -39,30 +38,30 @@ public class SoftwareController {
         return organizationDao.findAll();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/softwares")
+    @RequestMapping(method = RequestMethod.GET, value = "/producer_service")
     public String get(Model model) {
-        model.addAttribute("software", new Software());
-        return "softwares";
+        model.addAttribute("producer_service", new ProducerService());
+        return "producer_service";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/softwares/{action}/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/producer_service/{action}/{id}")
     public String handleAction(@PathVariable Integer id, @PathVariable String action, Model model) {
-        Software software = (Software) softwareDao.getById(id);
+        ProducerService producerService = (ProducerService) producerServiceDao.getById(id);
         if (action.equalsIgnoreCase("edit")) {
-            model.addAttribute("software", software);
-            softwareDao.update(software);
-            return "softwares";
+            model.addAttribute("producer_service", producerService);
+            producerServiceDao.update(producerService);
+            return "producer_service";
         }
         else if (action.equalsIgnoreCase("delete")) {
-            softwareDao.delete(software);
+            producerServiceDao.delete(producerService);
         }
-        return "redirect:/softwares";
+        return "redirect:/producer_service";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/addsoftware")
-    public String add(@ModelAttribute("software") Software software, BindingResult result) {
-        softwareDao.update(software);
-        return "redirect:/softwares";
+    @RequestMapping(method = RequestMethod.POST, value = "/add_producer_service")
+    public String add(@ModelAttribute("producer_service") ProducerService producerService, BindingResult result) {
+        producerServiceDao.update(producerService);
+        return "redirect:/producer_service";
     }
 
 
