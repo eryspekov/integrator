@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>infocom</groupId>
-    <artifactId>integrator1</artifactId>
+    <artifactId>integrator</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.2.1.Final</version>
+            <version>5.2.3.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>

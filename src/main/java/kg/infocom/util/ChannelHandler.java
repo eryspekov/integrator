@@ -2,6 +2,10 @@ package kg.infocom.util;
 
 import com.google.gson.*;
 import kg.infocom.dao.AbstractDao;
+import kg.infocom.model.Argument;
+import kg.infocom.model.ConsumerService;
+import kg.infocom.model.Element;
+import kg.infocom.model.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -10,84 +14,93 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by eryspekov on 25.08.16.
  */
-@Configuration
-@PropertySource("classpath:wsPath.properties")
+//@Configuration
+//@PropertySource("classpath:wsPath.properties")
+@Transactional
 public class ChannelHandler {
 
     @Autowired
     private Environment env;
 
     @Autowired
-    @Qualifier(value = "consumerService")
+    @Qualifier(value = "consumerServiceDao")
     private AbstractDao consumerServiceDao;
 
     public Message<String> handleConsumerRequest(Message<?> inMessage) {
 
         String method = (String) inMessage.getPayload();
-        String var = (String) inMessage.getHeaders().get("var");
+        String param = (String) inMessage.getHeaders().get("var");
 
-        //поиск записи в таблице consumer_service по method
-        //затем вытаскиваем все producer_services
-        String url = env.getProperty("passport.url");
+        String query = "from ConsumerService cs where cs.method = :method";
+        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, "method", method);
 
-        //передаем аргументы, в том числе токены
-        String token = env.getProperty("passport.token");
-        String param = var;
-
-        //по полученным параметрам получаем данные от продюсеров/поставщиков
-        String passportJson = getDataJson(param, url, token);
-
-        //
-        String zagsJson = getDataJson(param, env.getProperty("zags.url"), env.getProperty("zags.token"));
-        String asbJson = getAddress(env.getProperty("asb.url") + param);
-
-        //выбираем нужные поля и создаем новый объект/игнорируем ненужные поля
+        JsonObject jsonObjectResult = new JsonObject();
         JsonParser parser = new JsonParser();
 
-        JsonObject passportObject = parser.parse(passportJson).getAsJsonObject();
-        JsonObject zagsObject = parser.parse(zagsJson).getAsJsonObject();
-        JsonObject asbObject = parser.parse(asbJson).getAsJsonObject();
+        for (int i = 0; i < csList.size(); i++) {
 
-        //сведения какие поля включать, берутся из таблицы element
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("pin", zagsObject.get("pin").getAsString());
-        jsonObject.addProperty("name", zagsObject.get("name").getAsString());
-        jsonObject.addProperty("surname", zagsObject.get("surname").getAsString());
-        jsonObject.addProperty("patronymic", zagsObject.get("patronymic").getAsString());
-        jsonObject.addProperty("docSeries", passportObject.get("passport_series").getAsString());
-        jsonObject.addProperty("docNumber", passportObject.get("passport_number").getAsString());
-        jsonObject.addProperty("address", asbObject.get("message").getAsString());
+            ConsumerService cs = csList.get(i);
 
-        return MessageBuilder.withPayload(jsonObject.toString()).copyHeadersIfAbsent(inMessage.getHeaders())
+            Set<Element> elemList = cs.getElements();
+
+            List<ProducerService> psList = cs.getProducerServices();
+            for (int j = 0; j < psList.size(); j++) {
+
+                ProducerService ps = psList.get(j);
+                String url = ps.getUrl();
+                Set<Argument> arguments = ps.getArguments();
+                List<Element> elements = ps.getElements();
+
+                String jsonData = getDataJson(param, url, arguments);
+                JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
+
+                for (int k = 0; k < elements.size(); k++) {
+
+                    Element element = elements.get(k);
+
+                    if (elemList.contains(element)) {
+
+                        jsonObjectResult.addProperty(element.getName(), jsonObject.get(element.getName()).getAsString());
+
+                    }
+                }
+            }
+        }
+
+        return MessageBuilder.withPayload(jsonObjectResult.toString()).copyHeadersIfAbsent(inMessage.getHeaders())
                 .setHeader("http_statusCode", HttpStatus.OK).build();
 
     }
 
+    public String getDataJson(String param, String url, Set<Argument> arguments) {
 
-    public String getDataJson(String param, String url, String token) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(url).queryParam("verbose", true);
-        String response = target.queryParam("token", token)
-                .queryParam("pin", param)
-                .request().get(String.class);
-        client.close();
-        return response;
-    }
 
-    public String getAddress(String url) {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(url).queryParam("verbose", true);
+        for (Iterator<Argument> it = arguments.iterator(); it.hasNext(); ) {
+            Argument arg = it.next();
+            if (arg.getStatic()) {
+                target = target.queryParam(arg.getName(), arg.getValue());
+            }else {
+                target = target.queryParam(arg.getName(), param);
+            }
+        }
         String response = target.request().get(String.class);
         client.close();
         return response;
+
     }
 
 }

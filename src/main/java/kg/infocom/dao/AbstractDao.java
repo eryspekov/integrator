@@ -8,6 +8,7 @@ import java.util.List;
 public interface AbstractDao<T> {
 
     T getById(Integer id);
+    List<?> getByNamedParam(String query, String param, T value);
     List<T> findAll();
     T create(T entity);
     T update(T entity);

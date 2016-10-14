@@ -21,6 +21,10 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
 
     public T getById(Integer id) { return ht.get(type, id); }
 
+    public List<?> getByNamedParam(String query, String param, T value) {
+        return ht.findByNamedParam(query, param, value);
+    }
+
     public List<T> findAll() {
         return ht.loadAll(type);
     }

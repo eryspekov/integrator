@@ -1,14 +1,13 @@
 package kg.infocom.model;
 
 import javax.persistence.*;
-import java.util.List;
 
 /**
- * Created by eryspekov on 16.08.16.
+ * Created by eryspekov on 12.10.16.
  */
 @Entity
-@Table(name = "organization")
-public class Organization {
+@Table(name = "web_service_type")
+public class WebServiceType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +32,4 @@ public class Organization {
     public void setName(String name) {
         this.name = name;
     }
-
 }

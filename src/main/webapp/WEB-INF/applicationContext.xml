@@ -22,7 +22,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="consumerService" class="kg.infocom.dao.AbstractDaoImpl">
+    <bean id="consumerServiceDao" class="kg.infocom.dao.AbstractDaoImpl">
         <constructor-arg>
             <value>kg.infocom.model.ConsumerService</value>
         </constructor-arg>
