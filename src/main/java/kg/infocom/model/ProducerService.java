@@ -1,11 +1,6 @@
 package kg.infocom.model;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,7 +8,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "producer_service")
-@Transactional
 public class ProducerService {
 
     @Id
@@ -41,21 +35,19 @@ public class ProducerService {
             inverseJoinColumns = @JoinColumn(name = "arg_id"))
     private Set<Argument> arguments;
 
-    public List<Element> getElements() {
-        return elements;
-    }
-
-    public void setElements(List<Element> elements) {
-        this.elements = elements;
-    }
-
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "producer_element",
             joinColumns = @JoinColumn(name = "ps_id"),
             inverseJoinColumns = @JoinColumn(name = "element_id"))
-    //@LazyCollection(LazyCollectionOption.TRUE)
-    private List<Element> elements;
+    private Set<Element> elements;
 
+    public Set<Element> getElements() {
+        return elements;
+    }
+
+    public void setElements(Set<Element> elements) {
+        this.elements = elements;
+    }
 
     public Integer getId() {
         return id;

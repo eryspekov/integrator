@@ -8,13 +8,11 @@ import kg.infocom.model.Element;
 import kg.infocom.model.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -26,9 +24,7 @@ import java.util.Set;
 /**
  * Created by eryspekov on 25.08.16.
  */
-//@Configuration
-//@PropertySource("classpath:wsPath.properties")
-@Transactional
+@Service
 public class ChannelHandler {
 
     @Autowired
@@ -55,20 +51,20 @@ public class ChannelHandler {
 
             Set<Element> elemList = cs.getElements();
 
-            List<ProducerService> psList = cs.getProducerServices();
-            for (int j = 0; j < psList.size(); j++) {
+            Set<ProducerService> producerServices = cs.getProducerServices();
+            for (Iterator<ProducerService> psIterator = producerServices.iterator(); psIterator.hasNext(); ) {
 
-                ProducerService ps = psList.get(j);
+                ProducerService ps = psIterator.next();
                 String url = ps.getUrl();
                 Set<Argument> arguments = ps.getArguments();
-                List<Element> elements = ps.getElements();
+                Set<Element> elements = ps.getElements();
 
                 String jsonData = getDataJson(param, url, arguments);
                 JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
 
-                for (int k = 0; k < elements.size(); k++) {
+                for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
 
-                    Element element = elements.get(k);
+                    Element element = elementIterator.next();
 
                     if (elemList.contains(element)) {
 

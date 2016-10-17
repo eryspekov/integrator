@@ -1,5 +1,7 @@
 package kg.infocom.dao;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**

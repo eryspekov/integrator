@@ -18,11 +18,7 @@ public class Element {
 
     @Column(name = "name", nullable = false)
     private String name;
-/*
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinColumn(name = "ps_id", nullable = false)
-    private ProducerService producerService;
-*/
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "elements")
     private Set<ProducerService> producerServices;
 
@@ -44,13 +40,5 @@ public class Element {
     public void setName(String name) {
         this.name = name;
     }
-/*
-    public ProducerService getProducerService() {
-        return producerService;
-    }
 
-    public void setProducerService(ProducerService producerService) {
-        this.producerService = producerService;
-    }
-    */
 }

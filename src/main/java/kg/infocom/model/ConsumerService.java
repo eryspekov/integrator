@@ -22,7 +22,7 @@ public class ConsumerService {
     @Column(name = "method", nullable = false)
     private String method;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 
@@ -31,7 +31,7 @@ public class ConsumerService {
     @JoinTable(name = "consumer_producer",
             joinColumns = @JoinColumn(name = "cs_id"),
             inverseJoinColumns = @JoinColumn(name = "ps_id"))
-    private List<ProducerService> producerServices;
+    private Set<ProducerService> producerServices;
 
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -88,11 +88,11 @@ public class ConsumerService {
         this.webServiceType = webServiceType;
     }
 
-    public List<ProducerService> getProducerServices() {
+    public Set<ProducerService> getProducerServices() {
         return producerServices;
     }
 
-    public void setProducerServices(List<ProducerService> producerServices) {
+    public void setProducerServices(Set<ProducerService> producerServices) {
         this.producerServices = producerServices;
     }
 
