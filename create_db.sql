@@ -14,6 +14,7 @@ CREATE TABLE "producer_service" (
 	"name" varchar NOT NULL UNIQUE,
 	"url" varchar NOT NULL UNIQUE,
 	"ws_id" integer NOT NULL,
+	"with_param" BOOLEAN NOT NULL DEFAULT 'true',
 	CONSTRAINT producer_service_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -111,7 +112,7 @@ OIDS=FALSE
 
 CREATE TABLE "producer_element" (
 	"id" serial NOT NULL,
-	"ps_id" integer NOT NULL,
+	"ps__id" integer NOT NULL,
 	"element_id" integer NOT NULL,
 	CONSTRAINT producer_element_pk PRIMARY KEY ("id")
 ) WITH (
@@ -141,5 +142,5 @@ ALTER TABLE "consumer_element" ADD CONSTRAINT "consumer_element_fk1" FOREIGN KEY
 ALTER TABLE "consumer_arg" ADD CONSTRAINT "consumer_arg_fk0" FOREIGN KEY ("cs_id") REFERENCES "consumer_service"("id");
 ALTER TABLE "consumer_arg" ADD CONSTRAINT "consumer_arg_fk1" FOREIGN KEY ("arg_id") REFERENCES "argument"("id");
 
-ALTER TABLE "producer_element" ADD CONSTRAINT "producer_element_fk0" FOREIGN KEY ("ps_id") REFERENCES "producer_service"("id");
+ALTER TABLE "producer_element" ADD CONSTRAINT "producer_element_fk0" FOREIGN KEY ("ps__id") REFERENCES "producer_service"("id");
 ALTER TABLE "producer_element" ADD CONSTRAINT "producer_element_fk1" FOREIGN KEY ("element_id") REFERENCES "element"("id");

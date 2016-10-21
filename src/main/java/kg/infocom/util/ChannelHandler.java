@@ -57,7 +57,7 @@ public class ChannelHandler {
                 Set<Argument> arguments = ps.getArguments();
                 Set<Element> elements = ps.getElements();
 
-                String jsonData = jsonData = getDataJson(param, url, arguments, ps.getWith_param());
+                String jsonData = getDataJson(param, url, arguments, ps.getWith_param());
                 JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
 
                 for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
