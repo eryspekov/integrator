@@ -3,7 +3,7 @@
        xmlns:beans="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="http://www.springframework.org/schema/integration"
-       xmlns:int-htpp="http://www.springframework.org/schema/integration/http"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/integration
@@ -14,22 +14,39 @@
 
     <beans:bean id="channelHandler" class="kg.infocom.util.ChannelHandler"/>
 
-    <int-htpp:inbound-gateway
+    <channel id="requestChannel"/>
+    <channel id="replyChannel"/>
+    <int-http:inbound-gateway
             supported-methods="GET"
             request-channel="requestChannel"
             reply-channel="replyChannel"
             path="/services/{method}/{var}"
             payload-expression="#pathVariables.method">
-        <int-htpp:header name="var" expression="#pathVariables.var"/>
-    </int-htpp:inbound-gateway>
-
-    <channel id="requestChannel"/>
-    <channel id="replyChannel"/>
-
+        <int-http:header name="var" expression="#pathVariables.var"/>
+    </int-http:inbound-gateway>
     <service-activator input-channel="requestChannel"
                        output-channel="replyChannel"
                        ref="channelHandler"
                        method="handleConsumerRequest"
                        requires-reply="true"/>
+
+    <channel id="catalogRequestChannel"/>
+    <channel id="catalogReplyChannel"/>
+    <int-http:inbound-gateway
+            request-channel="catalogRequestChannel"
+            reply-channel="catalogReplyChannel"
+            supported-methods="GET"
+            path="services/catalogs/{var}"
+            payload-expression="#pathVariables.var">
+    </int-http:inbound-gateway>
+    <service-activator input-channel="catalogRequestChannel"
+                       output-channel="catalogReplyChannel"
+                       ref="channelHandler"
+                       method="getCatalog"/>
+
+
+
+    <!--<publish-subscribe-channel id="publishSubscribeChannel"/>-->
+
 
 </beans:beans>

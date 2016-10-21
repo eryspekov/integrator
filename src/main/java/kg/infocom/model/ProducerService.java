@@ -25,6 +25,9 @@ public class ProducerService {
     @Column(name = "url", nullable = false)
     private String url;
 
+    @Column(name = "with_param", nullable = false)
+    private Boolean with_param;
+
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
@@ -97,4 +100,11 @@ public class ProducerService {
         this.arguments = arguments;
     }
 
+    public Boolean getWith_param() {
+        return with_param;
+    }
+
+    public void setWith_param(Boolean with_param) {
+        this.with_param = with_param;
+    }
 }
