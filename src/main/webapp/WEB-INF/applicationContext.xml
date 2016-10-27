@@ -10,18 +10,6 @@
 
     <context:annotation-config/>
 
-    <bean id="organizationDao" class="kg.infocom.dao.AbstractDaoImpl">
-        <constructor-arg>
-            <value>kg.infocom.model.Organization</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="producerServiceDao" class="kg.infocom.dao.AbstractDaoImpl">
-        <constructor-arg>
-             <value>kg.infocom.model.ProducerService</value>
-        </constructor-arg>
-    </bean>
-
     <bean id="consumerServiceDao" class="kg.infocom.dao.AbstractDaoImpl">
         <constructor-arg>
             <value>kg.infocom.model.ConsumerService</value>

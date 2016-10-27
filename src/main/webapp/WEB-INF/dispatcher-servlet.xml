@@ -12,7 +12,7 @@
 
 
     <mvc:annotation-driven/>
-    <context:component-scan base-package="kg.infocom.controller"/>
+    <context:component-scan base-package="kg.infocom.service, kg.infocom.controller"/>
 <!--
     -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">

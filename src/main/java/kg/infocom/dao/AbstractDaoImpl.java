@@ -12,6 +12,7 @@ import java.util.List;
  * Created by eryspekov on 16.08.16.
  */
 @Repository
+@Transactional
 public class AbstractDaoImpl<T> implements AbstractDao<T> {
 
     private Class<T> type;

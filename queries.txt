@@ -1,0 +1,16 @@
+select ps.name, arg.name, pa.order_num from argument arg
+inner join producer_arg pa on pa.arg_id=arg.id
+inner join producer_service ps on ps.id=pa.ps_id
+where ps.id=10 and not arg.is_static
+
+select cs.id, cs.name, cs.method, ps.id, ps.name, ps.url from consumer_service cs
+inner join consumer_producer cp on cp.cs_id=cs.id
+inner join producer_service ps on ps.id=cp.ps_id
+where cs.id=2
+
+select cs.id, cs.name, cs.method, ps.id, ps.name, ps.url, el.id, el.name from consumer_service cs
+inner join consumer_element ce on ce.cs_id=cs.id
+inner join element el on el.id=ce.element_id
+inner join producer_element pe on pe.element_id=el.id
+inner join producer_service ps on ps.id=pe.ps_id
+where cs.id=2

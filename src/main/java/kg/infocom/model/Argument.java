@@ -26,9 +26,6 @@ public class Argument {
     private String value;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "arguments")
-    private Set<ProducerService> producerServices;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "arguments")
     private Set<ConsumerService> consumerServices;
 
     public Integer getId() {
@@ -63,14 +60,6 @@ public class Argument {
         this.value = value;
     }
 
-    public Set<ProducerService> getProducerServices() {
-        return producerServices;
-    }
-
-    public void setProducerServices(Set<ProducerService> producerServices) {
-        this.producerServices = producerServices;
-    }
-
     public Set<ConsumerService> getConsumerServices() {
         return consumerServices;
     }
@@ -78,4 +67,5 @@ public class Argument {
     public void setConsumerServices(Set<ConsumerService> consumerServices) {
         this.consumerServices = consumerServices;
     }
+
 }

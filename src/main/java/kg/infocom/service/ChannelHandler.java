@@ -1,28 +1,27 @@
-package kg.infocom.util;
+package kg.infocom.service;
 
 import com.google.gson.*;
 import kg.infocom.dao.AbstractDao;
-import kg.infocom.model.Argument;
-import kg.infocom.model.ConsumerService;
-import kg.infocom.model.Element;
-import kg.infocom.model.ProducerService;
+import kg.infocom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.GenericMessage;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by eryspekov on 25.08.16.
  */
+@Service("channelHandler")
+@Transactional
 public class ChannelHandler {
 
     @Autowired
@@ -32,10 +31,12 @@ public class ChannelHandler {
     @Qualifier(value = "consumerServiceDao")
     private AbstractDao consumerServiceDao;
 
-    public String handleConsumerRequest(Message<String> inMessage) {
+    //@Secured("ROLE_REST_HTTP_USER")
+    @Transactional
+    public Message<?> handleConsumerRequest(Message<?> inMessage) {
 
-        String method = inMessage.getPayload();
-        String param = (String) inMessage.getHeaders().get("var");
+        Map<String, String> map = (LinkedHashMap) inMessage.getPayload();
+        String method = map.get("method");
 
         String query = "from ConsumerService cs where cs.method = :method";
         List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, "method", method);
@@ -54,10 +55,10 @@ public class ChannelHandler {
 
                 ProducerService ps = psIterator.next();
                 String url = ps.getUrl();
-                Set<Argument> arguments = ps.getArguments();
+                Set<ProducerArguments> arguments = ps.getArguments();
                 Set<Element> elements = ps.getElements();
 
-                String jsonData = getDataJson(param, url, arguments, ps.getWith_param());
+                String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
                 JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
 
                 for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
@@ -73,7 +74,9 @@ public class ChannelHandler {
             }
         }
 
-        return jsonObjectResult.toString();
+        Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
+        setReturnStatusAndMessage("0", "Success", responseHeaderMap);
+        return new GenericMessage<String>(jsonObjectResult.toString(), responseHeaderMap);
 
     }
 
@@ -98,9 +101,9 @@ public class ChannelHandler {
 
                 ProducerService ps = psIterator.next();
                 String url = ps.getUrl();
-                Set<Argument> arguments = ps.getArguments();
+                //Set<Argument> arguments = ps.getArguments();
 
-                jsonData = getDataJson("", url, arguments, ps.getWith_param());
+                //jsonData = getDataJson("", url, arguments, ps.getWith_param());
 
             }
         }
@@ -108,13 +111,18 @@ public class ChannelHandler {
         return jsonData;
     }
 
-    public String getDataJson(String param, String url, Set<Argument> arguments, Boolean withParam) {
+    public String getDataJson(Map<String, String> params, String url, Set<ProducerArguments> arguments, Boolean withParam) {
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(url).queryParam("verbose", true);
 
-        for (Iterator<Argument> it = arguments.iterator(); it.hasNext(); ) {
-            Argument arg = it.next();
+        for (Iterator<ProducerArguments> it = arguments.iterator(); it.hasNext(); ) {
+            ProducerArguments producerArguments = it.next();
+            Argument arg = producerArguments.getArgument();
+            Integer order_num = producerArguments.getOrder_num();
+
+            String param = params.get("var"+order_num);
+
             if (withParam) {
                 if (arg.getStatic()) {
                     target = target.queryParam(arg.getName(), arg.getValue());
@@ -129,7 +137,20 @@ public class ChannelHandler {
         String response = target.request().get(String.class);
         client.close();
         return response;
-
     }
+
+    private void setReturnStatusAndMessage(String status, String message, Map<String, Object> responseHeaderMap){
+        responseHeaderMap.put("Return-Status", status);
+        responseHeaderMap.put("Return-Status-Msg", message);
+    }
+
+    public String getString() {
+        return "it's string";
+    }
+
+    public void printString(String s) {
+        System.out.println(s);
+    }
+
 
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans
-       xmlns:beans="http://www.springframework.org/schema/beans"
+<beans
+       xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns="http://www.springframework.org/schema/integration"
+       xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -12,26 +12,52 @@
        http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
 
-    <beans:bean id="channelHandler" class="kg.infocom.util.ChannelHandler"/>
+    <int:annotation-config/>
 
-    <channel id="requestChannel"/>
-    <channel id="replyChannel"/>
+    <int:channel id="requestChannel"/>
+    <int:channel id="replyChannel"/>
     <int-http:inbound-gateway
             supported-methods="GET"
             request-channel="requestChannel"
             reply-channel="replyChannel"
-            path="/services/{method}/{var}"
-            payload-expression="#pathVariables.method">
-        <int-http:header name="var" expression="#pathVariables.var"/>
+            path="/services/{method}/{var1}"
+            mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
+            reply-timeout="50000"
+            payload-expression="#pathVariables">
     </int-http:inbound-gateway>
-    <service-activator input-channel="requestChannel"
+
+    <int-http:inbound-gateway
+            supported-methods="GET"
+            request-channel="requestChannel"
+            reply-channel="replyChannel"
+            path="/services/{method}/{var1}/{var2}"
+            mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
+            reply-timeout="50000"
+            payload-expression="#pathVariables">
+    </int-http:inbound-gateway>
+
+    <int-http:inbound-gateway
+            supported-methods="GET"
+            request-channel="requestChannel"
+            reply-channel="replyChannel"
+            path="/services/{method}/{var1}/{var2}/{var3}"
+            mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
+            reply-timeout="50000"
+            payload-expression="#pathVariables">
+    </int-http:inbound-gateway>
+
+    <int:service-activator input-channel="requestChannel"
                        output-channel="replyChannel"
                        ref="channelHandler"
                        method="handleConsumerRequest"
-                       requires-reply="true"/>
+                       requires-reply="true"
+                       send-timeout="60000"/>
 
-    <channel id="catalogRequestChannel"/>
-    <channel id="catalogReplyChannel"/>
+
+
+
+    <int:channel id="catalogRequestChannel"/>
+    <int:channel id="catalogReplyChannel"/>
     <int-http:inbound-gateway
             request-channel="catalogRequestChannel"
             reply-channel="catalogReplyChannel"
@@ -39,7 +65,7 @@
             path="services/catalogs/{var}"
             payload-expression="#pathVariables.var">
     </int-http:inbound-gateway>
-    <service-activator input-channel="catalogRequestChannel"
+    <int:service-activator input-channel="catalogRequestChannel"
                        output-channel="catalogReplyChannel"
                        ref="channelHandler"
                        method="getCatalog"/>
@@ -48,5 +74,27 @@
 
     <!--<publish-subscribe-channel id="publishSubscribeChannel"/>-->
 
+    <int:channel id="inputChannel"/>
+    <int:inbound-channel-adapter ref="channelHandler" method="getString" channel="inputChannel">
+        <int:poller fixed-rate="200000"/>
+    </int:inbound-channel-adapter>
+    <int:service-activator input-channel="inputChannel" ref="channelHandler" method="printString"/>
 
-</beans:beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</beans>

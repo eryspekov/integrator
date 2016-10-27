@@ -24,17 +24,20 @@ public class ChannelController {
     private AbstractDao consumerServiceDao;
 
     @RequestMapping(method = RequestMethod.GET,
-            value = "/getCatalogs/{name}",
-            params = {"pin", "name"})//,
-            //consumes = "application/json")
-    //headers = "Accept=application/json")
+            value = "/getPersonDataByPin/{method}",
+            params = {"var1", "var2", "var3", "var4"},
+            produces = "application/json")
     @ResponseBody
     public String getPersonDataByPin(
-            @PathVariable("name") String name,
-            @RequestParam("pin") String pin,
-            @RequestParam(value = "surname", required = false) String surname) {
+            @PathVariable("method") String method,
+            @RequestParam(value = "var1", required = false) String var1,
+            @RequestParam(value = "var2", required = false) String var2,
+            @RequestParam(value = "var3", required = true) String var3,
+            @RequestParam(value = "var4", required = false) String var4
+            ) {
         //http://localhost:8080/integration/services/getPersonByParam?pin=214121987&name=edil
-        return surname+"-----"+name+":ok:"+pin;
+        //return surname+"-----"+name+":ok:"+pin;
+        return "it's getPersonDataByPin";
     }
 
 

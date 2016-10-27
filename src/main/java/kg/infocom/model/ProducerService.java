@@ -32,11 +32,8 @@ public class ProducerService {
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JoinTable(name = "producer_arg",
-            joinColumns = @JoinColumn(name = "ps_id"),
-            inverseJoinColumns = @JoinColumn(name = "arg_id"))
-    private Set<Argument> arguments;
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "producerService")
+    private Set<ProducerArguments> arguments;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "producer_element",
@@ -92,19 +89,19 @@ public class ProducerService {
         this.webServiceType = webServiceType;
     }
 
-    public Set<Argument> getArguments() {
-        return arguments;
-    }
-
-    public void setArguments(Set<Argument> arguments) {
-        this.arguments = arguments;
-    }
-
     public Boolean getWith_param() {
         return with_param;
     }
 
     public void setWith_param(Boolean with_param) {
         this.with_param = with_param;
+    }
+
+    public Set<ProducerArguments> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(Set<ProducerArguments> arguments) {
+        this.arguments = arguments;
     }
 }
