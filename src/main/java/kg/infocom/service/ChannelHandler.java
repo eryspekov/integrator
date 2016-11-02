@@ -5,10 +5,17 @@ import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +28,6 @@ import java.util.*;
  * Created by eryspekov on 25.08.16.
  */
 @Service("channelHandler")
-@Transactional
 public class ChannelHandler {
 
     @Autowired
@@ -32,7 +38,6 @@ public class ChannelHandler {
     private AbstractDao consumerServiceDao;
 
     //@Secured("ROLE_REST_HTTP_USER")
-    @Transactional
     public Message<?> handleConsumerRequest(Message<?> inMessage) {
 
         Map<String, String> map = (LinkedHashMap) inMessage.getPayload();
@@ -76,7 +81,11 @@ public class ChannelHandler {
 
         Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
         setReturnStatusAndMessage("0", "Success", responseHeaderMap);
-        return new GenericMessage<String>(jsonObjectResult.toString(), responseHeaderMap);
+        //return new GenericMessage<String>(jsonObjectResult.toString(), responseHeaderMap);
+        return MessageBuilder.withPayload(jsonObjectResult.toString())
+                .copyHeadersIfAbsent(inMessage.getHeaders())
+                .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
+                .build();
 
     }
 
@@ -101,9 +110,11 @@ public class ChannelHandler {
 
                 ProducerService ps = psIterator.next();
                 String url = ps.getUrl();
-                //Set<Argument> arguments = ps.getArguments();
+                Set<ProducerArguments> arguments = ps.getArguments();
 
-                //jsonData = getDataJson("", url, arguments, ps.getWith_param());
+                Map<String, String> map = null;
+
+                jsonData = getDataJson(map, url, arguments, ps.getWith_param());
 
             }
         }
@@ -121,7 +132,10 @@ public class ChannelHandler {
             Argument arg = producerArguments.getArgument();
             Integer order_num = producerArguments.getOrder_num();
 
-            String param = params.get("var"+order_num);
+            String param = null;
+            if (params != null) {
+                param = params.get("var"+order_num);
+            }
 
             if (withParam) {
                 if (arg.getStatic()) {
@@ -148,8 +162,14 @@ public class ChannelHandler {
         return "it's string";
     }
 
-    public void printString(String s) {
+    public String printString(String s) {
         System.out.println(s);
+        return "ok";
+    }
+
+    public void printMessage(Message<?> m) {
+        System.out.println("it's message");
+        //return "ok";
     }
 
 

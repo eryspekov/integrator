@@ -14,12 +14,12 @@
     <mvc:annotation-driven/>
     <context:component-scan base-package="kg.infocom.service, kg.infocom.controller"/>
 <!--
-    -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/jsp/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+    -->
                <!--<bean id="userValidator" class="ru.expomap.test.validation.UserValidator"/>-->
                <!--<bean id="projectValidator" name="projectValidator" class="ru.expomap.test.validation.ProjectValidator"/>-->
                <!--<bean id="taskValidator" name="taskValidator" class="ru.expomap.test.validation.TaskValidator"/>-->

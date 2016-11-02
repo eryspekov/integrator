@@ -34,11 +34,11 @@ public class ConsumerService {
     private Set<ProducerService> producerServices;
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    /*@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "consumer_arg",
             joinColumns = @JoinColumn(name = "cs_id"),
             inverseJoinColumns = @JoinColumn(name = "arg_id"))
-    private Set<Argument> arguments;
+    private Set<Argument> arguments;*/
 
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -96,11 +96,4 @@ public class ConsumerService {
         this.producerServices = producerServices;
     }
 
-    public Set<Argument> getArguments() {
-        return arguments;
-    }
-
-    public void setArguments(Set<Argument> arguments) {
-        this.arguments = arguments;
-    }
 }
