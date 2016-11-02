@@ -15,7 +15,7 @@ public class ProducerArguments {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     @JoinColumn(name = "ps_id", nullable = false)
     private ProducerService producerService;
 
@@ -34,13 +34,13 @@ public class ProducerArguments {
         this.id = id;
     }
 
-    public ProducerService getProducerService() {
+    /*public ProducerService getProducerService() {
         return producerService;
     }
 
     public void setProducerService(ProducerService producerService) {
         this.producerService = producerService;
-    }
+    }*/
 
     public Argument getArgument() {
         return argument;
