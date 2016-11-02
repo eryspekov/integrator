@@ -25,9 +25,6 @@ public class Argument {
     @Column(name = "arg_value")
     private String value;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "arguments")
-    private Set<ConsumerService> consumerServices;
-
     public Integer getId() {
         return id;
     }
@@ -60,12 +57,5 @@ public class Argument {
         this.value = value;
     }
 
-    public Set<ConsumerService> getConsumerServices() {
-        return consumerServices;
-    }
-
-    public void setConsumerServices(Set<ConsumerService> consumerServices) {
-        this.consumerServices = consumerServices;
-    }
 
 }

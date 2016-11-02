@@ -19,12 +19,6 @@ public class Element {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "elements")
-    private Set<ProducerService> producerServices;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "elements")
-    private Set<ConsumerService> consumerServices;
-
     public Integer getId() {
         return id;
     }

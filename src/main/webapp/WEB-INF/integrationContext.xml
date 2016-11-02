@@ -24,6 +24,7 @@
             mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
             reply-timeout="50000"
             payload-expression="#pathVariables">
+        <int-http:request-mapping produces="application/json"/>
     </int-http:inbound-gateway>
 
     <int-http:inbound-gateway
@@ -73,18 +74,42 @@
 
 
     <!--<publish-subscribe-channel id="publishSubscribeChannel"/>-->
-
+<!--
     <int:channel id="inputChannel"/>
     <int:inbound-channel-adapter ref="channelHandler" method="getString" channel="inputChannel">
-        <int:poller fixed-rate="200000"/>
-    </int:inbound-channel-adapter>
-    <int:service-activator input-channel="inputChannel" ref="channelHandler" method="printString"/>
+        <int:poller fixed-rate="2000"/>
+    </int:inbound-channel-adapter> -->
+    <!--<int:service-activator input-channel="outboundReplyChannel" ref="channelHandler" method="printString"/>-->
 
+    <int-http:inbound-gateway
+            path="/checkOutbound"
+            request-channel="inboundRequestChannel"
+            reply-channel="inboundReplyChannel"
+            supported-methods="GET"/>
 
+    <int:service-activator
+            input-channel="inboundRequestChannel"
+            output-channel="inboundReplyChannel"
+            ref="channelHandler"
+            method="printMessage"/>
 
+    <int:channel id="inboundRequestChannel"/>
+    <int:channel id="inboundReplyChannel"/>
 
+    <!--
+    <int:channel id="outboundReplyChannel"/>
+    <int:channel id="outboundRequestChannel"/>
+    <int-http:outbound-gateway
+            request-channel="inputChannel"
+            reply-channel="outboundReplyChannel"
+            url="http://localhost:8080/integration/checkOutbound"
+            http-method="GET"
+            expected-response-type="java.lang.String">
 
+        <int:poller fixed-rate="2000" default="true"/>
+    </int-http:outbound-gateway>
 
+-->
 
 
 
