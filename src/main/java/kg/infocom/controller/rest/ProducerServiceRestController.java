@@ -7,24 +7,24 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by kbakytbekov on 20.10.2016.
  */
-public class ProducerServiceRestController {
+@RestController
+@RequestMapping("/rest/producers/")
+public class ProducerServiceRestController implements Serializable {
     @Autowired
     @Qualifier(value = "producerServiceDao")
     private AbstractDao producerServiceDao;
 
 
-    @RequestMapping(value = "/rest/producers/", method = RequestMethod.GET)
+    @RequestMapping( method = RequestMethod.GET)
     public ResponseEntity<List<ProducerService>> listAllProducerServices() {
         List<ProducerService> users = producerServiceDao.findAll();
         if(users.isEmpty()){
@@ -32,7 +32,15 @@ public class ProducerServiceRestController {
         }
         return new ResponseEntity<List<ProducerService>>(users, HttpStatus.OK);
     }
-    @RequestMapping(value = "/rest/producers/", method = RequestMethod.POST)
+    @RequestMapping(value = "{id}",method = RequestMethod.GET)
+    public ResponseEntity<ProducerService> getById(@PathVariable("id") Integer id) {
+        ProducerService users = (ProducerService) producerServiceDao.getById(id);
+        if(users==null){
+            return new ResponseEntity<ProducerService>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<ProducerService>(users, HttpStatus.OK);
+    }
+    @RequestMapping( method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody ProducerService organization, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + organization.getName());
 
@@ -46,7 +54,7 @@ public class ProducerServiceRestController {
 
     //------------------- Update a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/producers/{id}/", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<ProducerService> updateUser(@PathVariable("id") int id, @RequestBody ProducerService organization) {
         System.out.println("Updating User " + id);
 
@@ -65,7 +73,7 @@ public class ProducerServiceRestController {
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/producers/{id}/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<ProducerService> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 

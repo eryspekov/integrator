@@ -18,7 +18,7 @@ public class ProducerService {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
@@ -28,7 +28,7 @@ public class ProducerService {
     @Column(name = "with_param", nullable = false)
     private Boolean with_param;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 

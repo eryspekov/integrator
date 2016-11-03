@@ -46,4 +46,10 @@
         </constructor-arg>
     </bean>
 
+    <bean id="producerArgDao" class="kg.infocom.dao.AbstractDaoImpl">
+        <constructor-arg>
+            <value>kg.infocom.model.ProducerArguments</value>
+        </constructor-arg>
+    </bean>
+
 </beans>

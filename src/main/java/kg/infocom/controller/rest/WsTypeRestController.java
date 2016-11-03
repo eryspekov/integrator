@@ -10,19 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by kbakytbekov on 20.10.2016.
  */
 @RestController
-public class WsTypeRestController {
+@RequestMapping("/rest/wss/")
+public class WsTypeRestController implements Serializable {
     @Autowired
     @Qualifier(value = "wsDao")
     private AbstractDao wsDao;
 
 
-    @RequestMapping(value = "/rest/wss/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<WebServiceType>> listAllWebServiceTypes() {
         List<WebServiceType> users = wsDao.findAll();
         if(users.isEmpty()){
@@ -30,7 +32,15 @@ public class WsTypeRestController {
         }
         return new ResponseEntity<List<WebServiceType>>(users, HttpStatus.OK);
     }
-    @RequestMapping(value = "/rest/wss/", method = RequestMethod.POST)
+    @RequestMapping(value = "{id}",method = RequestMethod.GET)
+    public ResponseEntity<WebServiceType> getById(@PathVariable("id") Integer id) {
+        WebServiceType users = (WebServiceType) wsDao.getById(id);
+        if(users==null){
+            return new ResponseEntity<WebServiceType>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<WebServiceType>(users, HttpStatus.OK);
+    }
+    @RequestMapping( method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody WebServiceType organization, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + organization.getName());
 
@@ -44,7 +54,7 @@ public class WsTypeRestController {
 
     //------------------- Update a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/wss/{id}/", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<WebServiceType> updateUser(@PathVariable("id") int id, @RequestBody WebServiceType organization) {
         System.out.println("Updating User " + id);
 
@@ -63,7 +73,7 @@ public class WsTypeRestController {
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/wss/{id}/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<WebServiceType> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 

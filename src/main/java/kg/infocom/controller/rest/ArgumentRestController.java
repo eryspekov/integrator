@@ -16,13 +16,14 @@ import java.util.List;
  * Created by kbakytbekov on 20.10.2016.
  */
 @RestController
+@RequestMapping("/rest/arguments/")
 public class ArgumentRestController {
     @Autowired
     @Qualifier(value = "argumentDao")
     private AbstractDao argumentDao;
 
 
-    @RequestMapping(value = "/rest/arguments/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Argument>> listAllArguments() {
         List<Argument> users = argumentDao.findAll();
         if(users.isEmpty()){
@@ -30,7 +31,15 @@ public class ArgumentRestController {
         }
         return new ResponseEntity<List<Argument>>(users, HttpStatus.OK);
     }
-    @RequestMapping(value = "/rest/arguments/", method = RequestMethod.POST)
+    @RequestMapping(value = "{id}",method = RequestMethod.GET)
+    public ResponseEntity<Argument> getById(@PathVariable("id") Integer id) {
+        Argument users = (Argument) argumentDao.getById(id);
+        if(users==null){
+            return new ResponseEntity<Argument>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<Argument>(users, HttpStatus.OK);
+    }
+    @RequestMapping( method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody Argument organization, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + organization.getName());
 
@@ -44,7 +53,7 @@ public class ArgumentRestController {
 
     //------------------- Update a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/arguments/{id}/", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<Argument> updateUser(@PathVariable("id") int id, @RequestBody Argument organization) {
         System.out.println("Updating User " + id);
 
@@ -63,7 +72,7 @@ public class ArgumentRestController {
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/arguments/{id}/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Argument> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 

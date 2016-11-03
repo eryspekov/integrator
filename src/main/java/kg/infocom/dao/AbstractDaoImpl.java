@@ -22,7 +22,7 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
 
     public AbstractDaoImpl(Class<T> type) { this.type = type; }
 
-    @Transactional
+//    @Transactional
     public T getById(Integer id) { return ht.get(type, id); }
 
     @Transactional
@@ -30,7 +30,7 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
         return ht.findByNamedParam(query, param, value);
     }
 
-    @Transactional
+//    @Transactional
     public List<T> findAll() {
         return ht.loadAll(type);
     }

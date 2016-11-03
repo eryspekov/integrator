@@ -22,7 +22,7 @@ public class ConsumerService {
     @Column(name = "method", nullable = false)
     private String method;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 

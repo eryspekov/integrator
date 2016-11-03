@@ -10,19 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by kbakytbekov on 20.10.2016.
  */
 @RestController
-public class OrgRestController {
+@RequestMapping("/rest/organizations")
+public class OrgRestController implements Serializable {
     @Autowired
     @Qualifier(value = "organizationDao")
     private AbstractDao organizationDao;
 
 
-    @RequestMapping(value = "/rest/organizations/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Organization>> listAllOrganizations() {
         List<Organization> users = organizationDao.findAll();
         if(users.isEmpty()){
@@ -30,7 +32,17 @@ public class OrgRestController {
         }
         return new ResponseEntity<List<Organization>>(users, HttpStatus.OK);
     }
-    @RequestMapping(value = "/rest/organizations/", method = RequestMethod.POST)
+
+    @RequestMapping(value = "{id}",method = RequestMethod.GET)
+    public ResponseEntity<Organization> getById(@PathVariable("id") Integer id) {
+        Organization users = (Organization)organizationDao.getById(id);
+        if(users==null){
+            return new ResponseEntity<Organization>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<Organization>(users, HttpStatus.OK);
+    }
+
+    @RequestMapping( method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody Organization organization, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + organization.getName());
 
@@ -44,7 +56,7 @@ public class OrgRestController {
 
     //------------------- Update a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/organizations/{id}/", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<Organization> updateUser(@PathVariable("id") int id, @RequestBody Organization organization) {
         System.out.println("Updating User " + id);
 
@@ -63,7 +75,7 @@ public class OrgRestController {
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/organizations/{id}/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Organization> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 

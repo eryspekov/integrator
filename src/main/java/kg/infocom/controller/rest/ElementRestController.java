@@ -16,13 +16,14 @@ import java.util.List;
  * Created by kbakytbekov on 20.10.2016.
  */
 @RestController
+@RequestMapping("/rest/elements")
 public class ElementRestController {
     @Autowired
     @Qualifier(value = "elementDao")
     private AbstractDao elementDao;
 
 
-    @RequestMapping(value = "/rest/elements/", method = RequestMethod.GET)
+    @RequestMapping( method = RequestMethod.GET)
     public ResponseEntity<List<Element>> listAllElements() {
         List<Element> users = elementDao.findAll();
         if(users.isEmpty()){
@@ -30,7 +31,15 @@ public class ElementRestController {
         }
         return new ResponseEntity<List<Element>>(users, HttpStatus.OK);
     }
-    @RequestMapping(value = "/rest/elements/", method = RequestMethod.POST)
+    @RequestMapping(value = "{id}",method = RequestMethod.GET)
+    public ResponseEntity<Element> getById(@PathVariable("id") Integer id) {
+        Element users = (Element) elementDao.getById(id);
+        if(users==null){
+            return new ResponseEntity<Element>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<Element>(users, HttpStatus.OK);
+    }
+    @RequestMapping( method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody Element organization, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + organization.getName());
 
@@ -44,7 +53,7 @@ public class ElementRestController {
 
     //------------------- Update a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/elements/{id}/", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<Element> updateUser(@PathVariable("id") int id, @RequestBody Element organization) {
         System.out.println("Updating User " + id);
 
@@ -63,7 +72,7 @@ public class ElementRestController {
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = "/rest/elements/{id}/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Element> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 
