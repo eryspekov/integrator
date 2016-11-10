@@ -78,13 +78,13 @@ public class ProducerArgRestController {
     public ResponseEntity<ProducerArguments> deleteUser(@PathVariable("id") int id) {
         System.out.println("Fetching & Deleting User with id " + id);
 
-        ProducerArguments ProducerArguments= (ProducerArguments) producerArgDao.getById(id);
-        if (ProducerArguments == null) {
+        ProducerArguments producerArguments= (ProducerArguments) producerArgDao.getById(id);
+        if (producerArguments == null) {
             System.out.println("Unable to delete. User with id " + id + " not found");
             return new ResponseEntity<ProducerArguments>(HttpStatus.NOT_FOUND);
         }
 
-        producerArgDao.delete(id);
+        producerArgDao.delete(producerArguments);
         return new ResponseEntity<ProducerArguments>(HttpStatus.NO_CONTENT);
     }
 }

@@ -85,7 +85,7 @@ public class OrgRestController implements Serializable {
             return new ResponseEntity<Organization>(HttpStatus.NOT_FOUND);
         }
 
-        organizationDao.delete(id);
+        organizationDao.delete(organization);
         return new ResponseEntity<Organization>(HttpStatus.NO_CONTENT);
     }
 }

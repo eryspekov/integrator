@@ -65,6 +65,8 @@ public class ArgumentRestController {
         }
 
         currentArgument.setName(organization.getName());
+        currentArgument.setStatic(organization.getStatic());
+        currentArgument.setValue(organization.getValue());
 
         argumentDao.update(currentArgument);
         return new ResponseEntity<Argument>(currentArgument, HttpStatus.OK);
@@ -82,7 +84,7 @@ public class ArgumentRestController {
             return new ResponseEntity<Argument>(HttpStatus.NOT_FOUND);
         }
 
-        argumentDao.delete(id);
+        argumentDao.delete(organization);
         return new ResponseEntity<Argument>(HttpStatus.NO_CONTENT);
     }
 }

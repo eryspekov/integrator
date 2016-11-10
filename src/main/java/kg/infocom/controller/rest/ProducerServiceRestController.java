@@ -66,6 +66,12 @@ public class ProducerServiceRestController implements Serializable {
         }
 
         currentProducerService.setName(organization.getName());
+        currentProducerService.setArguments(organization.getArguments());
+        currentProducerService.setElements(organization.getElements());
+        currentProducerService.setOrganization(organization.getOrganization());
+        currentProducerService.setUrl(organization.getUrl());
+        currentProducerService.setWebServiceType(organization.getWebServiceType());
+        currentProducerService.setWith_param(organization.getWith_param());
 
         producerServiceDao.update(currentProducerService);
         return new ResponseEntity<ProducerService>(currentProducerService, HttpStatus.OK);
@@ -83,7 +89,7 @@ public class ProducerServiceRestController implements Serializable {
             return new ResponseEntity<ProducerService>(HttpStatus.NOT_FOUND);
         }
 
-        producerServiceDao.delete(id);
+        producerServiceDao.delete(organization);
         return new ResponseEntity<ProducerService>(HttpStatus.NO_CONTENT);
     }
 }

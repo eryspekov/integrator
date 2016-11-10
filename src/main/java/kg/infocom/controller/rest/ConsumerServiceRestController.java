@@ -66,6 +66,11 @@ public class ConsumerServiceRestController {
         }
 
         currentConsumerService.setName(organization.getName());
+        currentConsumerService.setWebServiceType(organization.getWebServiceType());
+        currentConsumerService.setElements(organization.getElements());
+        currentConsumerService.setArguments(organization.getArguments());
+        currentConsumerService.setMethod(organization.getMethod());
+        currentConsumerService.setProducerServices(organization.getProducerServices());
 
         consumerServiceDao.update(currentConsumerService);
         return new ResponseEntity<ConsumerService>(currentConsumerService, HttpStatus.OK);
@@ -83,7 +88,7 @@ public class ConsumerServiceRestController {
             return new ResponseEntity<ConsumerService>(HttpStatus.NOT_FOUND);
         }
 
-        consumerServiceDao.delete(id);
+        consumerServiceDao.delete(organization);
         return new ResponseEntity<ConsumerService>(HttpStatus.NO_CONTENT);
     }
 }

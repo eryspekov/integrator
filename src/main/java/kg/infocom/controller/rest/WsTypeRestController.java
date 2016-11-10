@@ -83,7 +83,7 @@ public class WsTypeRestController implements Serializable {
             return new ResponseEntity<WebServiceType>(HttpStatus.NOT_FOUND);
         }
 
-        wsDao.delete(id);
+        wsDao.delete(organization);
         return new ResponseEntity<WebServiceType>(HttpStatus.NO_CONTENT);
     }
 }

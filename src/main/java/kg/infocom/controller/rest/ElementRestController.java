@@ -82,7 +82,7 @@ public class ElementRestController {
             return new ResponseEntity<Element>(HttpStatus.NOT_FOUND);
         }
 
-        elementDao.delete(id);
+        elementDao.delete(organization);
         return new ResponseEntity<Element>(HttpStatus.NO_CONTENT);
     }
 }
