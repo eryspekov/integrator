@@ -33,6 +33,8 @@ public class ConsumerService {
             inverseJoinColumns = @JoinColumn(name = "ps_id"))
     private Set<ProducerService> producerServices;
 
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "consumerService")
+    private Set<ConsumerArguments> arguments;
 
     /*@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "consumer_arg",
@@ -96,4 +98,11 @@ public class ConsumerService {
         this.producerServices = producerServices;
     }
 
+    public Set<ConsumerArguments> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(Set<ConsumerArguments> arguments) {
+        this.arguments = arguments;
+    }
 }
