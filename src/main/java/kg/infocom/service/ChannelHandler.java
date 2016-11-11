@@ -22,6 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
 import java.util.*;
 
 /**
@@ -62,25 +68,49 @@ public class ChannelHandler {
                 String url = ps.getUrl();
                 Set<ProducerArguments> arguments = ps.getArguments();
                 Set<Element> elements = ps.getElements();
+                WebServiceType wsType = ps.getWebServiceType();
 
-                String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
-                JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
+                if (wsType.getName().equals("rest")) {
 
-                for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
+                    String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
+                    JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
 
-                    Element element = elementIterator.next();
+                    for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
 
-                    if (elemList.contains(element)) {
+                        Element element = elementIterator.next();
 
-                        jsonObjectResult.addProperty(element.getName(), jsonObject.get(element.getName()).getAsString());
+                        if (elemList.contains(element)) {
 
+                            jsonObjectResult.addProperty(element.getName(), jsonObject.get(element.getName()).getAsString());
+
+                        }
                     }
+                } else {
+
+                    try {
+                        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+                        SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+                        SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(
+                                url,
+                                "ws",
+                                "token",
+                                "38c858bc765e78e394a2eef8e9701dce"),
+                                url);
+                        //printSOAPResponse(soapResponse);
+
+                        soapConnection.close();
+                    } catch (Exception e) {
+                        System.err.println("Error occurred while sending SOAP Request to Server");
+                        e.printStackTrace();
+                    }
+
                 }
+
             }
         }
 
-        Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
-        setReturnStatusAndMessage("0", "Success", responseHeaderMap);
+        //Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
+        //setReturnStatusAndMessage("0", "Success", responseHeaderMap);
         //return new GenericMessage<String>(jsonObjectResult.toString(), responseHeaderMap);
         return MessageBuilder.withPayload(jsonObjectResult.toString())
                 .copyHeadersIfAbsent(inMessage.getHeaders())
@@ -152,6 +182,57 @@ public class ChannelHandler {
         client.close();
         return response;
     }
+
+    private static SOAPMessage createSOAPRequest(String serverURL,
+                                                 String envelopeName,
+                                                 String header,
+                                                 String headerValue) throws Exception {
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        SOAPMessage soapMessage = messageFactory.createMessage();
+        SOAPPart soapPart = soapMessage.getSOAPPart();
+
+        //String serverURI = "http://address.infocom.kg/ws/";
+        //envelopeName = "ws"
+        //header = token
+        //headerValue = "0834ffc7d3d4883934708b1b270747df"
+        //body
+        //  1 level
+        //      level1.elem1="getAteName", "ws"
+        //  2 level
+        //      level2.elem1="id", 7410
+        //      level2.elem2="currentDate", "2016-11-01"
+
+        SOAPEnvelope envelope = soapPart.getEnvelope();
+        envelope.addNamespaceDeclaration(envelopeName, serverURL);
+
+        //SOAP Header
+        SOAPHeader soapHeader = soapMessage.getSOAPHeader();
+        SOAPElement token = soapHeader.addHeaderElement(new QName(header, header));
+        token.addTextNode(headerValue);
+
+        // SOAP Body
+        SOAPBody soapBody = envelope.getBody();
+        SOAPElement soapBodyElem = soapBody.addChildElement("getAteName", "ws");
+        SOAPElement soapBodyElem1 = soapBodyElem.addChildElement("id");
+        soapBodyElem1.addTextNode("7410");
+        SOAPElement soapBodyElem2 = soapBodyElem.addChildElement("currentDate");
+        soapBodyElem2.addTextNode("2016-11-01");
+
+        soapMessage.saveChanges();
+
+        return soapMessage;
+    }
+
+    private static void printSOAPResponse(SOAPMessage soapResponse) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        Source sourceContent = soapResponse.getSOAPPart().getContent();
+        System.out.print("\nResponse SOAP Message = ");
+        StreamResult result = new StreamResult(System.out);
+        transformer.transform(sourceContent, result);
+    }
+
+
 
     private void setReturnStatusAndMessage(String status, String message, Map<String, Object> responseHeaderMap){
         responseHeaderMap.put("Return-Status", status);
