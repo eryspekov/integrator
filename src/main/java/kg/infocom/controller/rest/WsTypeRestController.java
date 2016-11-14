@@ -78,6 +78,7 @@ public class WsTypeRestController implements Serializable {
         System.out.println("Fetching & Deleting User with id " + id);
 
         WebServiceType organization= (WebServiceType) wsDao.getById(id);
+        System.out.println(organization);
         if (organization == null) {
             System.out.println("Unable to delete. User with id " + id + " not found");
             return new ResponseEntity<WebServiceType>(HttpStatus.NOT_FOUND);
