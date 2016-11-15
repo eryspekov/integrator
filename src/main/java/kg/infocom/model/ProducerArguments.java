@@ -1,5 +1,8 @@
 package kg.infocom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.enterprise.inject.spi.Producer;
 import javax.persistence.*;
 
@@ -15,11 +18,12 @@ public class ProducerArguments {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "ps_id", nullable = false)
+    @JsonBackReference
     private ProducerService producerService;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "arg_id", nullable = false)
     private Argument argument;
 
@@ -34,13 +38,13 @@ public class ProducerArguments {
         this.id = id;
     }
 
-    /*public ProducerService getProducerService() {
+    public ProducerService getProducerService() {
         return producerService;
     }
 
     public void setProducerService(ProducerService producerService) {
         this.producerService = producerService;
-    }*/
+    }
 
     public Argument getArgument() {
         return argument;

@@ -1,5 +1,7 @@
 package kg.infocom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 /**
@@ -13,8 +15,9 @@ public class ConsumerArguments {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinColumn(name = "cs_id", nullable = false)
+    @JsonBackReference
     private ProducerService consumerService;
 
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
@@ -29,14 +32,6 @@ public class ConsumerArguments {
         this.id = id;
     }
 
-    /*public ProducerService getProducerService() {
-        return producerService;
-    }
-
-    public void setProducerService(ProducerService producerService) {
-        this.producerService = producerService;
-    }*/
-
     public Argument getArgument() {
         return argument;
     }
@@ -45,4 +40,11 @@ public class ConsumerArguments {
         this.argument = argument;
     }
 
+    public ProducerService getConsumerService() {
+        return consumerService;
+    }
+
+    public void setConsumerService(ProducerService consumerService) {
+        this.consumerService = consumerService;
+    }
 }

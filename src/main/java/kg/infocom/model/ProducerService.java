@@ -1,5 +1,7 @@
 package kg.infocom.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -32,7 +34,8 @@ public class ProducerService {
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 
-    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "producerService")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "producerService")
+    @JsonManagedReference
     private Set<ProducerArguments> arguments;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)

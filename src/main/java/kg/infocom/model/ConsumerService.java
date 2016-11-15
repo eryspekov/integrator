@@ -1,5 +1,7 @@
 package kg.infocom.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
@@ -33,14 +35,15 @@ public class ConsumerService {
             inverseJoinColumns = @JoinColumn(name = "ps_id"))
     private Set<ProducerService> producerServices;
 
-    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "consumerService")
-    private Set<ConsumerArguments> arguments;
+//    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "consumerService")
+//    @JsonManagedReference
+//    private Set<ConsumerArguments> arguments;
 
-    /*@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "consumer_arg",
             joinColumns = @JoinColumn(name = "cs_id"),
             inverseJoinColumns = @JoinColumn(name = "arg_id"))
-    private Set<Argument> arguments;*/
+    private Set<Argument> arguments;
 
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -98,11 +101,19 @@ public class ConsumerService {
         this.producerServices = producerServices;
     }
 
-    public Set<ConsumerArguments> getArguments() {
+//    public Set<ConsumerArguments> getArguments() {
+//        return arguments;
+//    }
+//
+//    public void setArguments(Set<ConsumerArguments> arguments) {
+//        this.arguments = arguments;
+//    }
+
+    public Set<Argument> getArguments() {
         return arguments;
     }
 
-    public void setArguments(Set<ConsumerArguments> arguments) {
+    public void setArguments(Set<Argument> arguments) {
         this.arguments = arguments;
     }
 }
