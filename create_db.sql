@@ -14,7 +14,7 @@ CREATE TABLE "producer_service" (
 	"name" varchar NOT NULL UNIQUE,
 	"url" varchar NOT NULL UNIQUE,
 	"ws_id" integer NOT NULL,
-	"with_param" BOOLEAN NOT NULL DEFAULT 'true',
+	"with_param" BOOLEAN NOT NULL,
 	CONSTRAINT producer_service_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -46,7 +46,7 @@ CREATE TABLE "argument" (
 	"id" serial NOT NULL,
 	"name" varchar NOT NULL UNIQUE,
 	"is_static" BOOLEAN NOT NULL,
-	"value" varchar NOT NULL,
+	"arg_value" varchar NOT NULL,
 	CONSTRAINT argument_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -70,6 +70,7 @@ CREATE TABLE "producer_arg" (
 	"id" serial NOT NULL,
 	"ps_id" integer NOT NULL,
 	"arg_id" integer NOT NULL,
+	"order_num" integer NOT NULL,
 	CONSTRAINT producer_arg_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
