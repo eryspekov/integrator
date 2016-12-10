@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint">
+        <intercept-url pattern="/services/**" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/rest/**" access="hasRole('ROLE_ADMIN')"/>
+        <http-basic />
+    </http>
+
+    <beans:bean id="restAuthenticationEntryPoint"
+                class="kg.infocom.security.RestAuthenticationEntryPoint"/>
+
+    <authentication-manager>
+        <authentication-provider>
+            <jdbc-user-service data-source-ref="dataSource"
+                               users-by-username-query="SELECT username, password, enabled FROM users WHERE enabled AND username = ?"
+                               authorities-by-username-query="SELECT u.username, ur.authority FROM users u INNER JOIN user_role ur ON u.id = ur.user_id WHERE u.username = ?"
+                               />
+        </authentication-provider>
+    </authentication-manager>
+
+    <global-method-security pre-post-annotations="enabled"/>
+
+</beans:beans>

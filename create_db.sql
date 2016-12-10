@@ -10,7 +10,7 @@ OIDS=FALSE
 
 CREATE TABLE "producer_service" (
 	"id" serial NOT NULL,
-	"organization_id" serial NOT NULL,
+	"organization_id" integer NOT NULL,
 	"name" varchar NOT NULL UNIQUE,
 	"url" varchar NOT NULL UNIQUE,
 	"ws_id" integer NOT NULL,
@@ -59,6 +59,8 @@ CREATE TABLE "consumer_service" (
 	"name" varchar NOT NULL UNIQUE,
 	"method" varchar NOT NULL UNIQUE,
 	"ws_is" integer NOT NULL,
+	"organization_id" BINARY NOT NULL,
+	"user_id" BINARY NOT NULL,
 	CONSTRAINT consumer_service_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -122,6 +124,29 @@ OIDS=FALSE
 
 
 
+CREATE TABLE "user" (
+	"id" serial NOT NULL,
+	"username" varchar(50) NOT NULL,
+	"password" varchar(50) NOT NULL,
+	"enabled" BOOLEAN NOT NULL DEFAULT 'false',
+	CONSTRAINT user_pk PRIMARY KEY ("id")
+) WITH (
+OIDS=FALSE
+);
+
+
+
+CREATE TABLE "user_role" (
+	"id" serial NOT NULL,
+	"user_id" integer NOT NULL,
+	"authority" varchar(50) NOT NULL,
+	CONSTRAINT user_role_pk PRIMARY KEY ("id")
+) WITH (
+OIDS=FALSE
+);
+
+
+
 
 ALTER TABLE "producer_service" ADD CONSTRAINT "producer_service_fk0" FOREIGN KEY ("organization_id") REFERENCES "organization"("id");
 ALTER TABLE "producer_service" ADD CONSTRAINT "producer_service_fk1" FOREIGN KEY ("ws_id") REFERENCES "web_service_type"("id");
@@ -130,6 +155,8 @@ ALTER TABLE "producer_service" ADD CONSTRAINT "producer_service_fk1" FOREIGN KEY
 
 
 ALTER TABLE "consumer_service" ADD CONSTRAINT "consumer_service_fk0" FOREIGN KEY ("ws_is") REFERENCES "web_service_type"("id");
+ALTER TABLE "consumer_service" ADD CONSTRAINT "consumer_service_fk1" FOREIGN KEY ("organization_id") REFERENCES "organization"("id");
+ALTER TABLE "consumer_service" ADD CONSTRAINT "consumer_service_fk2" FOREIGN KEY ("user_id") REFERENCES "user"("id");
 
 ALTER TABLE "producer_arg" ADD CONSTRAINT "producer_arg_fk0" FOREIGN KEY ("ps_id") REFERENCES "producer_service"("id");
 ALTER TABLE "producer_arg" ADD CONSTRAINT "producer_arg_fk1" FOREIGN KEY ("arg_id") REFERENCES "argument"("id");
@@ -145,3 +172,6 @@ ALTER TABLE "consumer_arg" ADD CONSTRAINT "consumer_arg_fk1" FOREIGN KEY ("arg_i
 
 ALTER TABLE "producer_element" ADD CONSTRAINT "producer_element_fk0" FOREIGN KEY ("ps__id") REFERENCES "producer_service"("id");
 ALTER TABLE "producer_element" ADD CONSTRAINT "producer_element_fk1" FOREIGN KEY ("element_id") REFERENCES "element"("id");
+
+
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_fk0" FOREIGN KEY ("user_id") REFERENCES "user"("id");

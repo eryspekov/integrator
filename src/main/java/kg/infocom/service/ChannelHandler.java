@@ -5,19 +5,12 @@ import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Component;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -43,8 +36,8 @@ public class ChannelHandler {
     @Qualifier(value = "consumerServiceDao")
     private AbstractDao consumerServiceDao;
 
-    //@Secured("ROLE_REST_HTTP_USER")
-    public Message<?> handleConsumerRequest(Message<?> inMessage) {
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message<String> handleConsumerRequest(Message<?> inMessage) {
 
         Map<String, String> map = (LinkedHashMap) inMessage.getPayload();
         String method = map.get("method");
@@ -81,7 +74,7 @@ public class ChannelHandler {
 
                         if (elemList.contains(element)) {
 
-                            jsonObjectResult.addProperty(element.getName(), jsonObject.get(element.getName()).getAsString());
+                            jsonObjectResult.add(element.getName(), jsonObject.get(element.getName()));
 
                         }
                     }
@@ -109,12 +102,11 @@ public class ChannelHandler {
             }
         }
 
-        //Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
-        //setReturnStatusAndMessage("0", "Success", responseHeaderMap);
-        //return new GenericMessage<String>(jsonObjectResult.toString(), responseHeaderMap);
-        return MessageBuilder.withPayload(jsonObjectResult.toString())
+        return MessageBuilder
+                .withPayload(jsonObjectResult.toString())
                 .copyHeadersIfAbsent(inMessage.getHeaders())
                 .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
+                .setHeader("Content-Type", "application/json;charset=UTF-8")
                 .build();
 
     }
@@ -233,11 +225,6 @@ public class ChannelHandler {
     }
 
 
-
-    private void setReturnStatusAndMessage(String status, String message, Map<String, Object> responseHeaderMap){
-        responseHeaderMap.put("Return-Status", status);
-        responseHeaderMap.put("Return-Status-Msg", message);
-    }
 
     public String getString() {
         return "it's string";

@@ -55,8 +55,6 @@
                        send-timeout="60000"/>
 
 
-
-
     <int:channel id="catalogRequestChannel"/>
     <int:channel id="catalogReplyChannel"/>
     <int-http:inbound-gateway
@@ -74,8 +72,9 @@
 
 
     <!--<publish-subscribe-channel id="publishSubscribeChannel"/>-->
-<!--
+
     <int:channel id="inputChannel"/>
+    <!--
     <int:inbound-channel-adapter ref="channelHandler" method="getString" channel="inputChannel">
         <int:poller fixed-rate="2000"/>
     </int:inbound-channel-adapter> -->
@@ -96,7 +95,7 @@
     <int:channel id="inboundRequestChannel"/>
     <int:channel id="inboundReplyChannel"/>
 
-    <!--
+
     <int:channel id="outboundReplyChannel"/>
     <int:channel id="outboundRequestChannel"/>
     <int-http:outbound-gateway
@@ -109,7 +108,7 @@
         <int:poller fixed-rate="2000" default="true"/>
     </int-http:outbound-gateway>
 
--->
+
 
 
 

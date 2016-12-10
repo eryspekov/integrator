@@ -40,5 +40,11 @@ public class ChannelController {
         return "it's getPersonDataByPin";
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/welcome")
+    @ResponseBody
+    public void test() {
+        System.out.println("test");
+    }
+
 
 }
