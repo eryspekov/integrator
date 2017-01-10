@@ -47,6 +47,16 @@
             payload-expression="#pathVariables">
     </int-http:inbound-gateway>
 
+    <int-http:inbound-gateway
+            supported-methods="GET"
+            request-channel="requestChannel"
+            reply-channel="replyChannel"
+            path="/services/{method}/{var1}/{var2}/{var3}/{var4}"
+            mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
+            reply-timeout="50000"
+            payload-expression="#pathVariables">
+    </int-http:inbound-gateway>
+
     <int:service-activator input-channel="requestChannel"
                        output-channel="replyChannel"
                        ref="channelHandler"
@@ -71,43 +81,42 @@
 
 
 
-    <!--<publish-subscribe-channel id="publishSubscribeChannel"/>-->
-
+    <!--<int:publish-subscribe-channel id="publishSubscribeChannel"/>-->
+<!--
     <int:channel id="inputChannel"/>
-    <!--
-    <int:inbound-channel-adapter ref="channelHandler" method="getString" channel="inputChannel">
-        <int:poller fixed-rate="2000"/>
-    </int:inbound-channel-adapter> -->
-    <!--<int:service-activator input-channel="outboundReplyChannel" ref="channelHandler" method="printString"/>-->
+
+    <int:inbound-channel-adapter channel="in" expression="''">
+        <int:poller fixed-rate="10000"/>
+    </int:inbound-channel-adapter>
+
+    <int:service-activator input-channel="out" ref="channelHandler" method="printMessage" requires-reply="false"/>
 
     <int-http:inbound-gateway
             path="/checkOutbound"
             request-channel="inboundRequestChannel"
             reply-channel="inboundReplyChannel"
             supported-methods="GET"/>
-
     <int:service-activator
             input-channel="inboundRequestChannel"
             output-channel="inboundReplyChannel"
             ref="channelHandler"
-            method="printMessage"/>
+            method="printMessageOut"/>
 
     <int:channel id="inboundRequestChannel"/>
     <int:channel id="inboundReplyChannel"/>
 
-
-    <int:channel id="outboundReplyChannel"/>
-    <int:channel id="outboundRequestChannel"/>
+    <int:channel id="out"/>
+    <int:channel id="in"/>
     <int-http:outbound-gateway
-            request-channel="inputChannel"
-            reply-channel="outboundReplyChannel"
-            url="http://localhost:8080/integration/checkOutbound"
+            request-channel="in"
+            reply-channel="out"
             http-method="GET"
-            expected-response-type="java.lang.String">
-
-        <int:poller fixed-rate="2000" default="true"/>
+            expected-response-type="java.lang.String"
+            url="http://10.51.1.29:9091/ws/set_passport_data?token=fc31242d9c4d4a12fc516d1e806b7abb&amp;pin=01234567891234&amp;name=Петя&amp;surname=Петров&amp;patronymic=Петрович">
     </int-http:outbound-gateway>
-
+-->
+            <!--url="http://localhost:8080/integration/checkOutbound">-->
+        <!--<int:poller fixed-rate="2000" default="true"/>-->
 
 
 

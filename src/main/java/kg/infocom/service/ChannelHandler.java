@@ -36,7 +36,7 @@ public class ChannelHandler {
     @Qualifier(value = "consumerServiceDao")
     private AbstractDao consumerServiceDao;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("hasRole('ROLE_USER')")
     public Message<String> handleConsumerRequest(Message<?> inMessage) {
 
         Map<String, String> map = (LinkedHashMap) inMessage.getPayload();
@@ -89,7 +89,7 @@ public class ChannelHandler {
                                 "token",
                                 "38c858bc765e78e394a2eef8e9701dce"),
                                 url);
-                        //printSOAPResponse(soapResponse);
+                        printSOAPResponse(soapResponse);
 
                         soapConnection.close();
                     } catch (Exception e) {
@@ -237,6 +237,11 @@ public class ChannelHandler {
 
     public void printMessage(Message<?> m) {
         System.out.println("it's message");
+        //return "ok";
+    }
+
+    public void printMessageOut(Message<?> m) {
+        System.out.println("it's OUT message");
         //return "ok";
     }
 
