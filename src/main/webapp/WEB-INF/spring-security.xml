@@ -11,6 +11,7 @@
     <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint">
         <intercept-url pattern="/services/**" access="hasRole('ROLE_USER')"/>
         <intercept-url pattern="/rest/**" access="hasRole('ROLE_ADMIN')"/>
+        <csrf disabled="true"/>
         <http-basic />
     </http>
 

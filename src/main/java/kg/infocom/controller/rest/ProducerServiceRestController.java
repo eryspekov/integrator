@@ -58,23 +58,23 @@ public class ProducerServiceRestController implements Serializable {
     public ResponseEntity<ProducerService> updateUser(@PathVariable("id") int id, @RequestBody ProducerService organization) {
         System.out.println("Updating User " + id);
 
-        ProducerService currentProducerService = (ProducerService) producerServiceDao.getById(id);
+//        ProducerService currentProducerService = (ProducerService) producerServiceDao.getById(id);
+//
+//        if (currentProducerService==null) {
+//            System.out.println("User with id " + id + " not found");
+//            return new ResponseEntity<ProducerService>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        currentProducerService.setName(organization.getName());
+//        currentProducerService.setArguments(organization.getArguments());
+//        currentProducerService.setElements(organization.getElements());
+//        currentProducerService.setOrganization(organization.getOrganization());
+//        currentProducerService.setUrl(organization.getUrl());
+//        currentProducerService.setWebServiceType(organization.getWebServiceType());
+//        currentProducerService.setWith_param(organization.getWith_param());
 
-        if (currentProducerService==null) {
-            System.out.println("User with id " + id + " not found");
-            return new ResponseEntity<ProducerService>(HttpStatus.NOT_FOUND);
-        }
-
-        currentProducerService.setName(organization.getName());
-        currentProducerService.setArguments(organization.getArguments());
-        currentProducerService.setElements(organization.getElements());
-        currentProducerService.setOrganization(organization.getOrganization());
-        currentProducerService.setUrl(organization.getUrl());
-        currentProducerService.setWebServiceType(organization.getWebServiceType());
-        currentProducerService.setWith_param(organization.getWith_param());
-
-        producerServiceDao.update(currentProducerService);
-        return new ResponseEntity<ProducerService>(currentProducerService, HttpStatus.OK);
+        producerServiceDao.update(organization);
+        return new ResponseEntity<ProducerService>(organization, HttpStatus.OK);
     }
 
     //------------------- Delete a User --------------------------------------------------------

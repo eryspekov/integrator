@@ -1,9 +1,8 @@
 package kg.infocom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.io.Serializable;
 
-import javax.enterprise.inject.spi.Producer;
 import javax.persistence.*;
 
 /**
@@ -11,19 +10,19 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "producer_arg")
-public class ProducerArguments {
+public class ProducerArguments implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "ps_id", nullable = false)
     @JsonBackReference
     private ProducerService producerService;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "arg_id", nullable = false)
     private Argument argument;
 

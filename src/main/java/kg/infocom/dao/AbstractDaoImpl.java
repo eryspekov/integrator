@@ -2,7 +2,6 @@ package kg.infocom.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @Transactional
 public class AbstractDaoImpl<T> implements AbstractDao<T> {
 
-    private Class<T> type;
+    private final Class<T> type;
 
     @Autowired
     protected HibernateTemplate ht;
@@ -31,6 +30,7 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
     }
 
 //    @Transactional
+    @Override
     public List<T> findAll() {
         return ht.loadAll(type);
     }
