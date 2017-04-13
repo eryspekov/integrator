@@ -2,6 +2,7 @@ package kg.infocom.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @Transactional
 public class AbstractDaoImpl<T> implements AbstractDao<T> {
 
-    private final Class<T> type;
+    private Class<T> type;
 
     @Autowired
     protected HibernateTemplate ht;
@@ -29,8 +30,14 @@ public class AbstractDaoImpl<T> implements AbstractDao<T> {
         return ht.findByNamedParam(query, param, value);
     }
 
+    @Transactional
+    public List<?> getByNamedParam(String query, String param[], T value[]) {
+//        System.out.println("param:"+param[0]+";"+param[1]);
+//        System.out.println("value:"+value[0]+";"+value[1]);
+        return ht.findByNamedParam(query, param, value);
+    }
+
 //    @Transactional
-    @Override
     public List<T> findAll() {
         return ht.loadAll(type);
     }

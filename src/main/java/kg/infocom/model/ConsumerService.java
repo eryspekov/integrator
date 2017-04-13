@@ -1,5 +1,6 @@
 package kg.infocom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 /**
  * Created by eryspekov on 10.10.16.
+ * Edited by kbakytbekov on 14.03.17
  */
 @Entity
 @Table(name = "consumer_service")
@@ -28,7 +30,6 @@ public class ConsumerService {
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
 
-
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "consumer_producer",
             joinColumns = @JoinColumn(name = "cs_id"),
@@ -47,6 +48,12 @@ public class ConsumerService {
             joinColumns = @JoinColumn(name = "cs_id"),
             inverseJoinColumns = @JoinColumn(name = "element_id"))
     private Set<Element> elements;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(name = "consumer_user",
+            joinColumns = @JoinColumn(name = "cs_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<Users> users;
 
     public Set<Element> getElements() {
         return elements;
@@ -103,5 +110,27 @@ public class ConsumerService {
 
     public void setArguments(Set<Argument> arguments) {
         this.arguments = arguments;
+    }
+
+    public Set<Users> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<Users> users) {
+        this.users = users;
+    }
+
+    @Override
+    public String toString() {
+        return "ConsumerService{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", method='" + method + '\'' +
+                ", webServiceType=" + webServiceType +
+                ", producerServices=" + producerServices +
+                ", arguments=" + arguments +
+                ", elements=" + elements +
+                ", users=" + users +
+                '}';
     }
 }

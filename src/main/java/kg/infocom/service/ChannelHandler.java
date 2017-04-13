@@ -1,16 +1,18 @@
 package kg.infocom.service;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,85 +25,106 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import java.util.*;
 
-/**
- * Created by eryspekov on 25.08.16.
- */
 @Service("channelHandler")
 public class ChannelHandler {
-
-    @Autowired
-    private Environment env;
 
     @Autowired
     @Qualifier(value = "consumerServiceDao")
     private AbstractDao consumerServiceDao;
 
-    //@PreAuthorize("hasRole('ROLE_USER')")
+    @Autowired
+    @Qualifier(value = "usersDao")
+    private AbstractDao usersDao;
+
+    @Autowired
+    @Qualifier(value = "servicelogDao")
+    private AbstractDao servicelogDao;
+
     public Message<String> handleConsumerRequest(Message<?> inMessage) {
-
+        ServiceLog serviceLog=new ServiceLog();
         Map<String, String> map = (LinkedHashMap) inMessage.getPayload();
+        // Get a set of the entries
+        String request="";
+        for(Map.Entry entry:map.entrySet()){
+            request+=entry.getKey()+":"+entry.getValue()+";";
+        }
         String method = map.get("method");
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        serviceLog.setRequest(request);
+        String q="from Users u where u.username=:username";
+        List<Users> user =  usersDao.getByNamedParam(q,"username",name);
 
-        String query = "from ConsumerService cs where cs.method = :method";
-        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, "method", method);
+//        String query = "from ConsumerService cs where cs.method = :method";
+//        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, "method", method);
 
+        String query = "select cs from ConsumerService cs LEFT JOIN FETCH cs.users where cs.method = :method and :users MEMBER OF cs.users";
+        String params[]={"method","users"};
+        Object[] values={method,user};
+        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, params, values);
+        System.out.println(csList);
         JsonObject jsonObjectResult = new JsonObject();
         JsonParser parser = new JsonParser();
+        if (csList.size()>0) {
 
-        for (int i = 0; i < csList.size(); i++) {
 
-            ConsumerService cs = csList.get(i);
+            for (int i = 0; i < csList.size(); i++) {
 
-            Set<Element> elemList = cs.getElements();
+                ConsumerService cs = csList.get(i);
 
-            Set<ProducerService> producerServices = cs.getProducerServices();
-            for (Iterator<ProducerService> psIterator = producerServices.iterator(); psIterator.hasNext(); ) {
+                Set<Element> elemList = cs.getElements();
 
-                ProducerService ps = psIterator.next();
-                String url = ps.getUrl();
-                Set<ProducerArguments> arguments = ps.getArguments();
-                Set<Element> elements = ps.getElements();
-                WebServiceType wsType = ps.getWebServiceType();
+                Set<ProducerService> producerServices = cs.getProducerServices();
+                for (Iterator<ProducerService> psIterator = producerServices.iterator(); psIterator.hasNext(); ) {
 
-                if (wsType.getName().equals("rest")) {
+                    ProducerService ps = psIterator.next();
+                    String url = ps.getUrl();
+                    Set<ProducerArguments> arguments = ps.getArguments();
+                    Set<Element> elements = ps.getElements();
+                    WebServiceType wsType = ps.getWebServiceType();
 
-                    String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
-                    JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
+                    if (wsType.getName().equals("rest")) {
 
-                    for (Iterator<Element> elementIterator = elements.iterator(); elementIterator.hasNext(); ) {
+                        String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
+                        JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
 
-                        Element element = elementIterator.next();
-
-                        if (elemList.contains(element)) {
-
-                            jsonObjectResult.add(element.getName(), jsonObject.get(element.getName()));
-
+                        for (Element element : elements) {
+                            if (elemList.contains(element)) {
+                                jsonObjectResult.add(element.getName(), jsonObject.get(element.getName()));
+                            }
                         }
-                    }
-                } else {
+                    } else {
 
-                    try {
-                        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-                        SOAPConnection soapConnection = soapConnectionFactory.createConnection();
-                        SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(
-                                url,
-                                "ws",
-                                "token",
-                                "38c858bc765e78e394a2eef8e9701dce"),
-                                url);
-                        printSOAPResponse(soapResponse);
+                        try {
+                            SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+                            SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+                            SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(
+                                    url,
+                                    "ws",
+                                    "token",
+                                    "38c858bc765e78e394a2eef8e9701dce"),
+                                    url);
+                            printSOAPResponse(soapResponse);
 
-                        soapConnection.close();
-                    } catch (Exception e) {
-                        System.err.println("Error occurred while sending SOAP Request to Server");
-                        e.printStackTrace();
+                            soapConnection.close();
+                        } catch (Exception e) {
+                            System.err.println("Error occurred while sending SOAP Request to Server");
+                            e.printStackTrace();
+                        }
+
                     }
 
                 }
-
             }
+        }else{
+            jsonObjectResult.addProperty("answer","You don't have the permission to use the service");
         }
-
+        System.out.println("jsonObjectResult.toString():"+jsonObjectResult.toString());
+        serviceLog.setResponse(jsonObjectResult.toString());
+        serviceLog.setUser(name);
+        serviceLog.setLogdate(new Date());
+        serviceLog.setIpaddress(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr());
+        System.out.println("ServiceLog:"+serviceLog);
+        servicelogDao.create(serviceLog);
         return MessageBuilder
                 .withPayload(jsonObjectResult.toString())
                 .copyHeadersIfAbsent(inMessage.getHeaders())

@@ -51,5 +51,15 @@
             <value>kg.infocom.model.ProducerArguments</value>
         </constructor-arg>
     </bean>
+    <bean id="usersDao" class="kg.infocom.dao.AbstractDaoImpl">
+        <constructor-arg>
+            <value>kg.infocom.model.Users</value>
+        </constructor-arg>
+    </bean>
+    <bean id="servicelogDao" class="kg.infocom.dao.AbstractDaoImpl">
+        <constructor-arg>
+            <value>kg.infocom.model.ServiceLog</value>
+        </constructor-arg>
+    </bean>
 
 </beans>

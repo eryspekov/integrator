@@ -25,6 +25,9 @@ public class ConsumerServiceRestController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<ConsumerService>> listAllConsumerServices() {
+
+
+
         List<ConsumerService> users = consumerServiceDao.findAll();
         System.out.println("users:"+users);
         if(users.isEmpty()){
