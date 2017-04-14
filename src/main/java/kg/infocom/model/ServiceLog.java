@@ -23,6 +23,8 @@ public class ServiceLog {
     private Date logdate;
     @Column(name = "ipaddress")
     private String ipaddress;
+    @Column(name = "method")
+    private String method;
 
     public Integer getId() {
         return id;
@@ -68,6 +70,14 @@ public class ServiceLog {
         return ipaddress;
     }
 
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     public void setIpaddress(String ipaddress) {
         this.ipaddress = ipaddress;
     }
@@ -81,6 +91,7 @@ public class ServiceLog {
                 ", response='" + response + '\'' +
                 ", logdate=" + logdate +
                 ", ipaddress='" + ipaddress + '\'' +
+                ", method='" + method + '\'' +
                 '}';
     }
 
