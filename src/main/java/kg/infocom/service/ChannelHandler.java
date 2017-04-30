@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 import javax.xml.soap.*;
 import javax.xml.transform.Source;
@@ -34,12 +36,20 @@ public class ChannelHandler {
     private AbstractDao consumerServiceDao;
 
     @Autowired
+    @Qualifier(value = "producerServiceDao")
+    private AbstractDao producerServiceDao;
+
+    @Autowired
     @Qualifier(value = "usersDao")
     private AbstractDao usersDao;
 
     @Autowired
     @Qualifier(value = "servicelogDao")
     private AbstractDao servicelogDao;
+
+    @Autowired
+    @Qualifier(value = "consumer.requestChannel")
+    private MessageChannel consumerRequestChannel;
 
     public Message<String> handleConsumerRequest(Message<?> inMessage) {
         ServiceLog serviceLog = new ServiceLog();
@@ -126,34 +136,40 @@ public class ChannelHandler {
 
     }
 
-    public String getCatalog(Message<?> inMessage) {
-        String catalog = (String) inMessage.getPayload();
-        String query = "from ConsumerService cs where cs.method = :method";
-        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, "method", catalog);
-        String jsonData = null;
-        JsonParser parser = new JsonParser();
-        for (int i = 0; i < csList.size(); i++) {
-            ConsumerService cs = csList.get(i);
-            Set<Element> elemList = cs.getElements();
-            Set<ProducerService> producerServices = cs.getProducerServices();
-            for (Iterator<ProducerService> psIterator = producerServices.iterator(); psIterator.hasNext(); ) {
-                ProducerService ps = psIterator.next();
-                String url = ps.getUrl();
-                Set<ProducerArguments> arguments = ps.getArguments();
-                Map<String, String> map = null;
-                jsonData = getDataJson(map, url, arguments, ps.getWith_param());
-            }
-        }
-        return jsonData;
+    public Message<String> getCatalog(Message<?> inMessage) {
+
+        String method = (String) inMessage.getPayload();
+
+        List<ConsumerService> csList = consumerServiceDao.getByNamedParam(
+                "select cs from ConsumerService cs LEFT JOIN FETCH cs.users where cs.method = :method and :users MEMBER OF cs.users"
+                , new String[]{"method", "users"}
+                , new Object[]{method, getUsersList()});
+
+        if (csList.size() == 0)
+            return MessageBuilder.withPayload("Denied permission to use the service or the service not found")
+                    .setHeader("http_statusCode", HttpStatus.NOT_IMPLEMENTED).build();
+
+        Set<ProducerService> psList = csList.get(0).getProducerServices();
+        if (psList.size() == 0)
+            return MessageBuilder.withPayload("Producer service not found")
+                    .setHeader("http_statusCode", HttpStatus.NOT_IMPLEMENTED).build();
+
+        Iterator<ProducerService> iterator = psList.iterator();
+        ProducerService ps = iterator.next();
+        Map<String, String> map = null;
+        String jsonData = getDataJson(map, ps.getUrl(), ps.getArguments(), ps.getWith_param());
+        return MessageBuilder
+                .withPayload(jsonData)
+                .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
+                .setHeader("Content-Type", "application/json;charset=UTF-8")
+                .build();
     }
 
     public String getDataJson(Map<String, String> params, String url, Set<ProducerArguments> arguments, Boolean withParam) {
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(url).queryParam("verbose", true);
-        System.out.println("test1");
         for (Iterator<ProducerArguments> it = arguments.iterator(); it.hasNext(); ) {
-            System.out.println("test2");
             ProducerArguments producerArguments = it.next();
             Argument arg = producerArguments.getArgument();
             Integer order_num = producerArguments.getOrder_num();
@@ -161,7 +177,6 @@ public class ChannelHandler {
             if (params != null) {
                 param = params.get("var" + order_num);
             }
-            System.out.println("test3");
             if (withParam) {
                 if (arg.getStatic()) {
                     target = target.queryParam(arg.getName(), arg.getValue());
@@ -171,17 +186,16 @@ public class ChannelHandler {
             } else {
                 target = target.resolveTemplate(arg.getName(), param);
             }
-            System.out.println("test4");
         }
-        String response = target.request().get(String.class);
+        String response = target.request().header("Authorization", "Basic " + DatatypeConverter.printBase64Binary("adm:adm".getBytes())).get(String.class);
         client.close();
         return response;
     }
 
-    private static SOAPMessage createSOAPRequest(String serverURL,
-                                                 String envelopeName,
-                                                 String header,
-                                                 String headerValue) throws Exception {
+    private SOAPMessage createSOAPRequest(String serverURL,
+                                          String envelopeName,
+                                          String header,
+                                          String headerValue) throws Exception {
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage soapMessage = messageFactory.createMessage();
         SOAPPart soapPart = soapMessage.getSOAPPart();
@@ -218,7 +232,7 @@ public class ChannelHandler {
         return soapMessage;
     }
 
-    private static void printSOAPResponse(SOAPMessage soapResponse) throws Exception {
+    private void printSOAPResponse(SOAPMessage soapResponse) throws Exception {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         Source sourceContent = soapResponse.getSOAPPart().getContent();
@@ -227,25 +241,79 @@ public class ChannelHandler {
         transformer.transform(sourceContent, result);
     }
 
+    public Message<String> handleProducerRequest(Message<?> inMessage) {
 
-    public String getString() {
-        return "it's string";
+        //define subscribes consumers and than send them producer's payload
+        MessageHeaders headers = inMessage.getHeaders();
+
+        String method = headers.get("method", String.class);
+
+        List<Users> userList = getUsersList();
+        if (userList.size() == 0)
+            return MessageBuilder.withPayload("User not found")
+                    .setHeader("http_statusCode", HttpStatus.NOT_IMPLEMENTED).build();
+
+        List<ProducerService> psList = producerServiceDao.getByNamedParam(
+                "from ProducerService where method = :method and users = :users",
+                new String[]{"method", "users"},
+                new Object[]{method, userList.get(0)});
+
+        if (psList.size() == 0)
+            return MessageBuilder.withPayload("Denied permission to use the service or the service not found")
+                    .setHeader("http_statusCode", HttpStatus.NOT_IMPLEMENTED).build();
+
+        ProducerService ps = psList.get(0);
+        sendToConsumerMessage(ps, inMessage.getPayload());
+
+        return MessageBuilder.withPayload("Your request has been successfully submitted")
+                .setHeader("http_statusCode", HttpStatus.OK).build();
+
     }
 
-    public String printString(String s) {
-        System.out.println(s);
-        return "ok";
+    public void commitReplyStatus(Message<?> inMessage) {
+        MessageHeaders headers = inMessage.getHeaders();
+        if (headers.containsKey("http_statusCode")) {
+            HttpStatus http_statusCode = headers.get("http_statusCode", HttpStatus.class);
+            if (http_statusCode == HttpStatus.OK) {
+                //write to db success status
+            }
+
+        }
     }
 
-    public void printMessage(Message<?> m) {
-        System.out.println("it's message");
-        //return "ok";
+    public void pollerGetProducerResponse(Message<?> inMessage) {
+
+        List<ProducerService> psList = producerServiceDao.getByNamedParam("from ProducerService where autoStartup = :start", "start", true);
+
+        for (ProducerService ps : psList) {
+
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target(ps.getUrl()).queryParam("verbose", true);
+            String response = target.request().get(String.class);
+            client.close();
+
+            sendToConsumerMessage(ps, response);
+        }
     }
 
-    public void printMessageOut(Message<?> m) {
-        System.out.println("it's OUT message");
-        //return "ok";
+    private void sendToConsumerMessage(ProducerService ps, Object response) {
+        Set<ConsumerService> csList = ps.getConsumerServices();
+        for (ConsumerService consumerService : csList) {
+            Message<?> message = MessageBuilder.withPayload(response)
+                    .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
+                    .setHeader("Content-Type", "application/json;charset=UTF-8")
+                    .setHeader("consumerUrl", consumerService.getUrl())
+                    .build();
+            consumerRequestChannel.send(message);
+        }
     }
 
+    private List<Users> getUsersList() {
+        List<Users> userList = usersDao.getByNamedParam(
+                "from Users u where u.username=:username",
+                "username",
+                SecurityContextHolder.getContext().getAuthentication().getName());
+        return userList;
+    }
 
 }

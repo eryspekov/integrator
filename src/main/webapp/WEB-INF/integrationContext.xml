@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
-       xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:int-http="http://www.springframework.org/schema/integration/http"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:int="http://www.springframework.org/schema/integration"
+        xmlns:int-http="http://www.springframework.org/schema/integration/http"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/integration
        http://www.springframework.org/schema/integration/spring-integration.xsd
@@ -58,76 +58,75 @@
     </int-http:inbound-gateway>
 
     <int:service-activator input-channel="requestChannel"
-                       output-channel="replyChannel"
-                       ref="channelHandler"
-                       method="handleConsumerRequest"
-                       requires-reply="true"
-                       send-timeout="60000"/>
+                           output-channel="replyChannel"
+                           ref="channelHandler"
+                           method="handleConsumerRequest"
+                           requires-reply="true"
+                           send-timeout="60000"/>
 
 
-    <int:channel id="catalogRequestChannel"/>
-    <int:channel id="catalogReplyChannel"/>
+    <!--catalogs-->
+    <int:channel id="catalog.requestChannel"/>
+    <int:channel id="catalog.replyChannel"/>
     <int-http:inbound-gateway
-            request-channel="catalogRequestChannel"
-            reply-channel="catalogReplyChannel"
+            request-channel="catalog.requestChannel"
+            reply-channel="catalog.replyChannel"
             supported-methods="GET"
             path="services/catalogs/{var}"
             payload-expression="#pathVariables.var">
     </int-http:inbound-gateway>
-    <int:service-activator input-channel="catalogRequestChannel"
-                       output-channel="catalogReplyChannel"
-                       ref="channelHandler"
-                       method="getCatalog"/>
+    <int:service-activator input-channel="catalog.requestChannel"
+                           output-channel="catalog.replyChannel"
+                           ref="channelHandler"
+                           method="getCatalog"/>
 
-
-
-    <!--<int:publish-subscribe-channel id="publishSubscribeChannel"/>-->
-<!--
-    <int:channel id="inputChannel"/>
-
-    <int:inbound-channel-adapter channel="in" expression="''">
-        <int:poller fixed-rate="10000"/>
+    <!---->
+    <!--handling of requests for subscribes consumers-->
+    <!---->
+    <!--poller-->
+    <int:channel id="producer.pollerRequestChannel"/>
+    <int:inbound-channel-adapter channel="producer.pollerChannel" expression="''" auto-startup="false">
+        <int:poller fixed-delay="10000"/>
     </int:inbound-channel-adapter>
-
-    <int:service-activator input-channel="out" ref="channelHandler" method="printMessage" requires-reply="false"/>
-
-    <int-http:inbound-gateway
-            path="/checkOutbound"
-            request-channel="inboundRequestChannel"
-            reply-channel="inboundReplyChannel"
-            supported-methods="GET"/>
     <int:service-activator
-            input-channel="inboundRequestChannel"
-            output-channel="inboundReplyChannel"
+                           input-channel="producer.pollerChannel"
+                           ref="channelHandler"
+                           method="pollerGetProducerResponse"
+                           requires-reply="false"/>
+
+    <!--initiator Producer-->
+    <int:channel id="producer.requestChannel"/>
+    <int:channel id="producer.replyChannel"/>
+    <int-http:inbound-gateway
+            request-channel="producer.requestChannel"
+            reply-channel="producer.replyChannel"
+            supported-methods="POST"
+            path="/services/producer/{method}">
+        <int-http:header name="method" expression="#pathVariables.method"/>
+    </int-http:inbound-gateway>
+
+    <int:service-activator
+            input-channel="producer.requestChannel"
+            output-channel="producer.replyChannel"
             ref="channelHandler"
-            method="printMessageOut"/>
+            method="handleProducerRequest"
+            requires-reply="true"/>
 
-    <int:channel id="inboundRequestChannel"/>
-    <int:channel id="inboundReplyChannel"/>
+    <int:channel id="consumer.requestChannel"/>
+    <int:channel id="consumer.replyChannel"/>
 
-    <int:channel id="out"/>
-    <int:channel id="in"/>
     <int-http:outbound-gateway
-            request-channel="in"
-            reply-channel="out"
-            http-method="GET"
+            request-channel="consumer.requestChannel"
+            reply-channel="consumer.replyChannel"
+            http-method="POST"
             expected-response-type="java.lang.String"
-            url="http://10.51.1.29:9091/ws/set_passport_data?token=fc31242d9c4d4a12fc516d1e806b7abb&amp;pin=01234567891234&amp;name=Петя&amp;surname=Петров&amp;patronymic=Петрович">
+            url-expression="headers.consumerUrl">
     </int-http:outbound-gateway>
--->
-            <!--url="http://localhost:8080/integration/checkOutbound">-->
-        <!--<int:poller fixed-rate="2000" default="true"/>-->
 
-
-
-
-
-
-
-
-
-
-
-
+    <int:service-activator
+            input-channel="consumer.replyChannel"
+            ref="channelHandler"
+            method="commitReplyStatus"
+            requires-reply="false"/>
 
 </beans>

@@ -55,6 +55,9 @@ public class ConsumerService {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Users> users;
 
+    @Column(name = "url")
+    private String url;
+
     public Set<Element> getElements() {
         return elements;
     }
@@ -132,5 +135,13 @@ public class ConsumerService {
                 ", elements=" + elements +
                 ", users=" + users +
                 '}';
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

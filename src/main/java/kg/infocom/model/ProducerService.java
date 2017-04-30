@@ -30,6 +30,19 @@ public class ProducerService {
     @Column(name = "with_param", nullable = false)
     private Boolean with_param;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(name = "consumer_producer",
+            joinColumns = @JoinColumn(name = "ps_id"),
+            inverseJoinColumns = @JoinColumn(name = "cs_id"))
+    private Set<ConsumerService> consumerServices;
+
+    @Column(name = "method", nullable = false)
+    private String method;
+
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users users;
+
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinColumn(name = "ws_id", nullable = false)
     private WebServiceType webServiceType;
@@ -43,6 +56,9 @@ public class ProducerService {
             joinColumns = @JoinColumn(name = "ps_id"),
             inverseJoinColumns = @JoinColumn(name = "element_id"))
     private Set<Element> elements;
+
+    @Column(name = "auto_startup")
+    private Boolean autoStartup;
 
     public Set<Element> getElements() {
         return elements;
@@ -106,5 +122,37 @@ public class ProducerService {
 
     public void setArguments(Set<ProducerArguments> arguments) {
         this.arguments = arguments;
+    }
+
+    public Set<ConsumerService> getConsumerServices() {
+        return consumerServices;
+    }
+
+    public void setConsumerServices(Set<ConsumerService> consumerServices) {
+        this.consumerServices = consumerServices;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
+    }
+
+    public Boolean getAutoStartup() {
+        return autoStartup;
+    }
+
+    public void setAutoStartup(Boolean autoStartup) {
+        this.autoStartup = autoStartup;
     }
 }

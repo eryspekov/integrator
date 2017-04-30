@@ -3,7 +3,9 @@ package kg.infocom.controller;
 import kg.infocom.dao.AbstractDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
  * Created by eryspekov on 25.08.16.
  */
 @Controller
-@RequestMapping(value = "services")
+@RequestMapping(value = "services-test")
 public class ChannelController {
 
     @Autowired
-    @Qualifier(value = "requestChannel")
+    @Qualifier(value = "producer.requestChannel")
     private MessageChannel requestChannel;
 
     @Autowired
@@ -42,8 +44,9 @@ public class ChannelController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/welcome")
     @ResponseBody
-    public void test() {
-        System.out.println("test");
+    public Message<String> test() {
+        requestChannel.send(MessageBuilder.withPayload("").build());
+        return MessageBuilder.withPayload("OK").build();
     }
 
 
