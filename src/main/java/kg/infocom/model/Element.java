@@ -35,4 +35,11 @@ public class Element {
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return "Element{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

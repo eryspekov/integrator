@@ -1,9 +1,12 @@
 package kg.infocom.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.*;
+import org.hibernate.mapping.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
@@ -27,6 +31,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service("channelHandler")
 public class ChannelHandler {
@@ -75,44 +83,58 @@ public class ChannelHandler {
         String params[] = {"method", "users"};
         Object[] values = {method, user};
         List<ConsumerService> csList = consumerServiceDao.getByNamedParam(query, params, values);
-        System.out.println(csList);
+//        System.out.println(csList);
         JsonObject jsonObjectResult = new JsonObject();
         JsonParser parser = new JsonParser();
+        JsonArray res = new JsonArray();
+        boolean ar = false;
         if (csList.size() > 0) {
             for (int i = 0; i < csList.size(); i++) {
                 ConsumerService cs = csList.get(i);
+//                System.out.println(cs);
                 Set<Element> elemList = cs.getElements();
+//                Set<ProducerService> producerServices = new TreeSet<ProducerService>(cs.getProducerServices());
                 Set<ProducerService> producerServices = cs.getProducerServices();
                 for (Iterator<ProducerService> psIterator = producerServices.iterator(); psIterator.hasNext(); ) {
                     ProducerService ps = psIterator.next();
+//                    System.out.println(ps.getId() + " " + ps.getName());
                     String url = ps.getUrl();
                     Set<ProducerArguments> arguments = ps.getArguments();
                     Set<Element> elements = ps.getElements();
                     WebServiceType wsType = ps.getWebServiceType();
                     if (wsType.getName().equals("rest")) {
                         String jsonData = getDataJson(map, url, arguments, ps.getWith_param());
-                        JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
-                        for (Element element : elements) {
-                            if (elemList.contains(element)) {
-                                jsonObjectResult.add(element.getName(), jsonObject.get(element.getName()));
+                        ar = checkJson(jsonData, true);
+                        if (ar) {
+                            JsonArray array = parser.parse(jsonData).getAsJsonArray();
+//                            System.out.println("size:" + array.size());
+                            for (int k = 0; k < array.size(); k++) {
+                                jsonObjectResult = new JsonObject();
+                                for (Element element : elements) {
+                                    if (elemList.contains(element)) {
+                                        if (jsonObjectResult.get(element.getName()) != null)
+                                            System.out.println(jsonObjectResult.get(element.getName()));
+                                        System.out.println(array.get(k).getAsJsonObject().get(element.getName()));
+                                        jsonObjectResult.add(element.getName(), array.get(k).getAsJsonObject().get(element.getName()));
+                                    }
+                                }
+//                                System.out.println(res.size()+" "+jsonObjectResult.toString());
+                                res.add(jsonObjectResult);
+//                                System.out.println(res.toString());
                             }
-                        }
-                    } else {
-                        try {
-                            SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-                            SOAPConnection soapConnection = soapConnectionFactory.createConnection();
-                            SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(
-                                    url,
-                                    "ws",
-                                    "token",
-                                    "38c858bc765e78e394a2eef8e9701dce"),
-                                    url);
-                            printSOAPResponse(soapResponse);
 
-                            soapConnection.close();
-                        } catch (Exception e) {
-                            System.err.println("Error occurred while sending SOAP Request to Server");
-                            e.printStackTrace();
+                        } else {
+                            JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
+                            int j = 0;
+                            for (Element element : elements) {
+                                if (elemList.contains(element)) {
+                                    j++;
+                                    if (jsonObjectResult.get(element.getName()) != null)
+                                        System.out.println(jsonObjectResult.get(element.getName()));
+                                    jsonObjectResult.add(element.getName(), jsonObject.get(element.getName()));
+                                }
+                            }
+                            System.out.println("count=" + j);
                         }
                     }
                 }
@@ -120,20 +142,55 @@ public class ChannelHandler {
         } else {
             jsonObjectResult.addProperty("answer", "You don't have the permission to use the service");
         }
-        System.out.println("jsonObjectResult.toString():" + jsonObjectResult.toString());
-        serviceLog.setResponse(jsonObjectResult.toString());
+//        System.out.println("jsonObjectResult.toString():" + jsonObjectResult.toString());
+        if (jsonObjectResult.toString().length() > 1500) {
+            serviceLog.setResponse(jsonObjectResult.toString().substring(0, 1500));
+        } else {
+            serviceLog.setResponse(jsonObjectResult.toString());
+        }
         serviceLog.setUser(name);
         serviceLog.setLogdate(new Date());
         serviceLog.setIpaddress(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr());
-        System.out.println("ServiceLog:" + serviceLog);
+//        System.out.println("ServiceLog:" + serviceLog);
         servicelogDao.create(serviceLog);
+
+        System.out.println("ar=" + ar);
+        System.out.println(ar ? res.toString() : jsonObjectResult.toString());
+
         return MessageBuilder
-                .withPayload(jsonObjectResult.toString())
+                .withPayload(ar ? res.toString() : jsonObjectResult.toString())
                 .copyHeadersIfAbsent(inMessage.getHeaders())
                 .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
                 .setHeader("Content-Type", "application/json;charset=UTF-8")
                 .build();
 
+    }
+
+    private boolean checkJson(String s, boolean t) {
+        JsonParser parser = new JsonParser();
+        JsonArray arr = null;
+        JsonObject obj = null;
+        boolean flag = false;
+        if (t) {
+            try {
+                arr = parser.parse(s).getAsJsonArray();
+                flag = arr.isJsonArray();
+//        arr.forEach(o->o.getAsJsonObject().entrySet().forEach(o1->System.out.println(o1.getKey()+"->"+o1.getValue())));
+//                System.out.println("Array:" + arr.isJsonObject());
+            } catch (Exception e) {
+                flag = false;
+            }
+        } else {
+            try {
+                obj = parser.parse(s).getAsJsonObject();
+                flag = obj.isJsonObject();
+//                System.out.println("Obj:" + arr.isJsonObject());
+
+            } catch (Exception e) {
+                flag = false;
+            }
+        }
+        return flag;
     }
 
     public Message<String> getCatalog(Message<?> inMessage) {
@@ -187,7 +244,10 @@ public class ChannelHandler {
                 target = target.resolveTemplate(arg.getName(), param);
             }
         }
-        String response = target.request().header("Authorization", "Basic " + DatatypeConverter.printBase64Binary("adm:adm".getBytes())).get(String.class);
+        Invocation.Builder request = target.request();
+//        System.out.println("request code=" + request.get().getStatus());
+        String response = request.get(String.class);
+//        System.out.println("request code=" + response);
         client.close();
         return response;
     }
