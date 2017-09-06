@@ -1,12 +1,10 @@
 package kg.infocom.service;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import kg.infocom.dao.AbstractDao;
 import kg.infocom.model.*;
-import org.hibernate.mapping.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -23,15 +21,16 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 import javax.xml.soap.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -301,12 +300,29 @@ public class ChannelHandler {
         transformer.transform(sourceContent, result);
     }
 
-    public Message<String> handleProducerRequest(Message<?> inMessage) {
+    public Message<String> handleProducerRequest(Message<?> inMessage) throws IOException {
 
         //define subscribes consumers and than send them producer's payload
         MessageHeaders headers = inMessage.getHeaders();
 
         String method = headers.get("method", String.class);
+
+        String[] temp=((String)inMessage.getPayload()).split("\n");
+        JsonObject obj = new JsonObject();
+        System.out.println("-------------------");
+        for (String t : temp) {
+//            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1));
+            System.out.println("++++++++++++++++");
+            System.out.println(t);
+            System.out.println(t.substring(0,t.indexOf("=")));
+            System.out.println(t.substring(t.indexOf("=")+1,t.length()));
+            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1,t.length()));
+            System.out.println("++++++++++++++++");
+        }
+        System.out.println("-------------------");
+        System.out.println("!!!!!!!!!!!!!!!!!!!!");
+        System.out.println(obj.toString());
+        System.out.println("!!!!!!!!!!!!!!!!!!!!");
 
         List<Users> userList = getUsersList();
         if (userList.size() == 0)
@@ -318,15 +334,22 @@ public class ChannelHandler {
                 new String[]{"method", "users"},
                 new Object[]{method, userList.get(0)});
 
+//        System.out.println(psList);
+
         if (psList.size() == 0)
             return MessageBuilder.withPayload("Denied permission to use the service or the service not found")
                     .setHeader("http_statusCode", HttpStatus.NOT_IMPLEMENTED).build();
 
         ProducerService ps = psList.get(0);
-        sendToConsumerMessage(ps, inMessage.getPayload());
 
-        return MessageBuilder.withPayload("Your request has been successfully submitted")
-                .setHeader("http_statusCode", HttpStatus.OK).build();
+
+        boolean flag = sendToConsumerMessage(ps, obj);
+
+        if (flag)
+            return MessageBuilder.withPayload("Your request has been successfully submitted")
+                    .setHeader("http_statusCode", HttpStatus.OK).build();
+        return MessageBuilder.withPayload("Internal server error in integrator").setHeader("Content-Type", "application/json;charset=UTF-8")
+                .setHeader("http_statusCode", HttpStatus.INTERNAL_SERVER_ERROR).build();
 
     }
 
@@ -341,7 +364,7 @@ public class ChannelHandler {
         }
     }
 
-    public void pollerGetProducerResponse(Message<?> inMessage) {
+    public void pollerGetProducerResponse(Message<?> inMessage) throws IOException {
 
         List<ProducerService> psList = producerServiceDao.getByNamedParam("from ProducerService where autoStartup = :start", "start", true);
 
@@ -356,16 +379,25 @@ public class ChannelHandler {
         }
     }
 
-    private void sendToConsumerMessage(ProducerService ps, Object response) {
+    private boolean sendToConsumerMessage(ProducerService ps, Object response) {
         Set<ConsumerService> csList = ps.getConsumerServices();
         for (ConsumerService consumerService : csList) {
-            Message<?> message = MessageBuilder.withPayload(response)
+
+            Message<?> message = MessageBuilder.withPayload(((JsonObject)response).toString())
+                    .setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36")
                     .setHeader("HTTP_RESPONSE_HEADERS", HttpStatus.OK)
                     .setHeader("Content-Type", "application/json;charset=UTF-8")
                     .setHeader("consumerUrl", consumerService.getUrl())
                     .build();
-            consumerRequestChannel.send(message);
+
+            System.out.println(message.toString());
+            try {
+                return consumerRequestChannel.send(message);
+            } catch (Exception e) {
+                return false;
+            }
         }
+        return false;
     }
 
     private List<Users> getUsersList() {

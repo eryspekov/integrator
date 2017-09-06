@@ -155,4 +155,21 @@ public class ProducerService {
     public void setAutoStartup(Boolean autoStartup) {
         this.autoStartup = autoStartup;
     }
+
+    @Override
+    public String toString() {
+        return "ProducerService{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", organization=" + organization +
+                ", url='" + url + '\'' +
+                ", with_param=" + with_param +
+                ", method='" + method + '\'' +
+                ", users=" + users +
+                ", webServiceType=" + webServiceType +
+                ", arguments=" + arguments +
+                ", elements=" + elements +
+                ", autoStartup=" + autoStartup +
+                '}';
+    }
 }

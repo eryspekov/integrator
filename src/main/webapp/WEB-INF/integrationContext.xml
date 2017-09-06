@@ -101,6 +101,7 @@
             request-channel="producer.requestChannel"
             reply-channel="producer.replyChannel"
             supported-methods="POST"
+
             path="/services/producer/{method}">
         <int-http:header name="method" expression="#pathVariables.method"/>
     </int-http:inbound-gateway>
