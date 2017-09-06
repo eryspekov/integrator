@@ -307,19 +307,19 @@ public class ChannelHandler {
 
         String method = headers.get("method", String.class);
 
-        String[] temp=((String)inMessage.getPayload()).split("\n");
+        String[] temp=((String)inMessage.getPayload()).split("&");
         JsonObject obj = new JsonObject();
-        System.out.println("-------------------");
+//        System.out.println("-------------------");
         for (String t : temp) {
-//            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1));
-            System.out.println("++++++++++++++++");
-            System.out.println(t);
-            System.out.println(t.substring(0,t.indexOf("=")));
-            System.out.println(t.substring(t.indexOf("=")+1,t.length()));
-            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1,t.length()));
-            System.out.println("++++++++++++++++");
+            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1));
+//            System.out.println("++++++++++++++++");
+//            System.out.println(t);
+//            System.out.println(t.substring(0,t.indexOf("=")));
+//            System.out.println(t.substring(t.indexOf("=")+1,t.length()));
+//            obj.addProperty(t.substring(0,t.indexOf("=")),t.substring(t.indexOf("=")+1,t.length()));
+//            System.out.println("++++++++++++++++");
         }
-        System.out.println("-------------------");
+//        System.out.println("-------------------");
         System.out.println("!!!!!!!!!!!!!!!!!!!!");
         System.out.println(obj.toString());
         System.out.println("!!!!!!!!!!!!!!!!!!!!");
@@ -346,9 +346,9 @@ public class ChannelHandler {
         boolean flag = sendToConsumerMessage(ps, obj);
 
         if (flag)
-            return MessageBuilder.withPayload("Your request has been successfully submitted")
+            return MessageBuilder.withPayload("Your request has been successfully submitted").setHeader("Content-Type", "text/plain;charset=UTF-8")
                     .setHeader("http_statusCode", HttpStatus.OK).build();
-        return MessageBuilder.withPayload("Internal server error in integrator").setHeader("Content-Type", "application/json;charset=UTF-8")
+        return MessageBuilder.withPayload("Internal server error in integrator").setHeader("Content-Type", "text/plain;charset=UTF-8")
                 .setHeader("http_statusCode", HttpStatus.INTERNAL_SERVER_ERROR).build();
 
     }
